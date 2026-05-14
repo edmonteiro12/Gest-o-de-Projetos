@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Gestão de Projetos</title>
+    <title>Gestão de Projetos Culturais</title>
     <style>
         * {
             margin: 0;
@@ -693,9 +693,9 @@
 <body>
     <div id="appContainer" class="app-container">
         <div class="header">
-            <div class="logo">🎭 Gestão de Projetos</div>
+            <div class="logo">🎭 Gestão de Projetos Culturais</div>
             <div class="user-info">
-                <span id="userNameDisplay"></span>
+                <span id="userNameDisplay">Usuário</span>
                 <button class="logout-btn" onclick="doLogout()">Sair</button>
             </div>
         </div>
@@ -916,12 +916,6 @@
                                     ➕ Adicionar Peça
                                 </button>
                             </div>
-                            
-                            <div class="action-buttons">
-                                <button type="button" class="btn-save" onclick="saveCurrentProject()">
-                                    💾 Salvar Projeto
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -960,152 +954,121 @@
         
         const formatosAudiovisual = ['Série', 'Longa-metragem', 'Curta-metragem', 'Novela', 'Reality Show', 'Documentário', 'Minissérie', 'Programa de TV', 'Videoclipe', 'Animação', 'Propaganda', 'Conteúdo para Web'];
         
+        // ========== FUNÇÕES AUXILIARES ==========
+        function escapeHtml(str) { 
+            if (!str) return ''; 
+            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
+        }
+        
+        function getCronogramaData() { return tarefasData; }
+        
         // ========== FUNÇÕES DE CALENDÁRIO ==========
         let currentDate = new Date();
 
-       function renderCalendar() {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    const monthYearElem = document.getElementById('monthYear');
-    if (monthYearElem) {
-        monthYearElem.textContent = `${currentDate.toLocaleString('pt-BR', { month: 'long' })} ${year}`;
-    }
-    
-    const firstDay = new Date(year, month, 1);
-    const startDay = firstDay.getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
-    let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
-    
-    // Coletar todas as tarefas e expandir para dias individuais
-    let todasTarefasPorDia = [];
-    projects.forEach(project => {
-        if (project.cronograma) {
-            Object.values(project.cronograma).forEach(faseTarefas => {
-                faseTarefas.forEach(tarefa => {
-                    if (tarefa.dataInicio && tarefa.dataFim) {
-                        // Expandir a tarefa para cada dia do período
-                        const startDate = new Date(tarefa.dataInicio);
-                        const endDate = new Date(tarefa.dataFim);
-                        const currentDateLoop = new Date(startDate);
-                        
-                        while (currentDateLoop <= endDate) {
-                            const ano = currentDateLoop.getFullYear();
-                            const mes = String(currentDateLoop.getMonth() + 1).padStart(2, '0');
-                            const dia = String(currentDateLoop.getDate()).padStart(2, '0');
-                            const dataStr = `${ano}-${mes}-${dia}`;
-                            
-                            // ID ÚNICO por: projeto + nome da tarefa + data específica
-                            const uniqueId = `${project.id}_${tarefa.nome.replace(/\s/g, '_')}_${dataStr}`;
-                            
-                            // Verificar se já existe status para este dia específico
-                            let statusDia = tarefa.status;
-                            if (tarefa.statusPorDia && tarefa.statusPorDia[dataStr]) {
-                                statusDia = tarefa.statusPorDia[dataStr];
-                            }
-                            
-                            todasTarefasPorDia.push({
-                                id: uniqueId,
-                                projectId: project.id,
-                                projectNome: project.nome,
-                                nome: tarefa.nome,
-                                data: dataStr,
-                                dataInicio: tarefa.dataInicio,
-                                dataFim: tarefa.dataFim,
-                                status: statusDia,
-                                responsavel: tarefa.responsavel
-                            });
-                            
-                            currentDateLoop.setDate(currentDateLoop.getDate() + 1);
-                        }
-                    }
-                });
-            });
-        }
-    });
-    
-    // Salvar estrutura de status por dia nos projetos
-    projects.forEach(project => {
-        if (project.cronograma) {
-            Object.values(project.cronograma).forEach(faseTarefas => {
-                faseTarefas.forEach(tarefa => {
-                    if (tarefa.dataInicio && tarefa.dataFim && !tarefa.statusPorDia) {
-                        tarefa.statusPorDia = {};
-                        const startDate = new Date(tarefa.dataInicio);
-                        const endDate = new Date(tarefa.dataFim);
-                        const currentDateLoop = new Date(startDate);
-                        
-                        while (currentDateLoop <= endDate) {
-                            const ano = currentDateLoop.getFullYear();
-                            const mes = String(currentDateLoop.getMonth() + 1).padStart(2, '0');
-                            const dia = String(currentDateLoop.getDate()).padStart(2, '0');
-                            const dataStr = `${ano}-${mes}-${dia}`;
-                            tarefa.statusPorDia[dataStr] = tarefa.status || 'pending';
-                            currentDateLoop.setDate(currentDateLoop.getDate() + 1);
-                        }
-                    }
-                });
-            });
-        }
-    });
-    
-    localStorage.setItem('cultureProjects', JSON.stringify(projects));
-    
-    let gridHtml = '';
-    for (let i = 0; i < startDay; i++) gridHtml += '<div class="calendar-day empty"></div>';
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const currentDateObj = new Date(year, month, day);
-        
-        // Filtrar tarefas que ocorrem nesta data específica
-        const tarefasNestaData = todasTarefasPorDia.filter(t => t.data === dateStr);
-        
-        const dayProjects = projects.filter(p => p.dataInicio === dateStr || p.dataTermino === dateStr);
-        
-        gridHtml += `<div class="calendar-day">
-            <div class="day-number">${day}</div>`;
-        
-        // Mostrar cada tarefa individualmente por DIA
-        tarefasNestaData.forEach(t => {
-            const dataFimTarefa = new Date(t.dataFim);
-            const diasRestantes = Math.ceil((dataFimTarefa - currentDateObj) / (1000 * 60 * 60 * 24));
-            const isUrgent = t.status !== 'completed' && diasRestantes <= 2 && diasRestantes >= 0;
-            const isOverdue = t.status !== 'completed' && diasRestantes < 0;
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
             
-            let statusClass = '';
-            let statusIcon = '';
-            
-            if (t.status === 'completed') {
-                statusClass = 'completed';
-                statusIcon = '✅';
-            } else if (isUrgent || isOverdue) {
-                statusClass = 'urgent';
-                statusIcon = '🔴';
-            } else {
-                statusClass = 'pending';
-                statusIcon = '⏳';
+            const monthYearElem = document.getElementById('monthYear');
+            if (monthYearElem) {
+                monthYearElem.textContent = `${currentDate.toLocaleString('pt-BR', { month: 'long' })} ${year}`;
             }
             
-            // Passar dados completos: ID único por DIA, projeto, nome, data específica
-            gridHtml += `<div class="calendar-event ${statusClass}" 
-                onclick="toggleTaskStatusByDay('${t.id}', ${t.projectId}, '${escapeHtml(t.nome)}', '${t.status}', '${t.data}', '${t.dataInicio}', '${t.dataFim}')"
-                title="${escapeHtml(t.projectNome)}: ${escapeHtml(t.nome)} - ${t.data}">
-                ${statusIcon} ${escapeHtml(t.nome.substring(0, 12))}
-            </div>`;
-        });
-        
-        dayProjects.forEach(p => {
-            gridHtml += `<div class="calendar-event" style="background: #667eea;" title="${escapeHtml(p.nome)}">📌 ${escapeHtml(p.nome.substring(0, 18))}</div>`;
-        });
-        
-        gridHtml += `</div>`;
-    }
-    
-    const calendarGrid = document.getElementById('calendarGrid');
-    if (calendarGrid) calendarGrid.innerHTML = gridHtml;
-}  
+            const firstDay = new Date(year, month, 1);
+            const startDay = firstDay.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            
+            let todasTarefasPorDia = [];
+            projects.forEach(project => {
+                if (project.cronograma) {
+                    Object.values(project.cronograma).forEach(faseTarefas => {
+                        faseTarefas.forEach(tarefa => {
+                            if (tarefa.dataInicio && tarefa.dataFim) {
+                                const startDate = new Date(tarefa.dataInicio);
+                                const endDate = new Date(tarefa.dataFim);
+                                const currentDateLoop = new Date(startDate);
+                                
+                                while (currentDateLoop <= endDate) {
+                                    const ano = currentDateLoop.getFullYear();
+                                    const mes = String(currentDateLoop.getMonth() + 1).padStart(2, '0');
+                                    const dia = String(currentDateLoop.getDate()).padStart(2, '0');
+                                    const dataStr = `${ano}-${mes}-${dia}`;
+                                    
+                                    let statusDia = tarefa.status;
+                                    if (tarefa.statusPorDia && tarefa.statusPorDia[dataStr]) {
+                                        statusDia = tarefa.statusPorDia[dataStr];
+                                    }
+                                    
+                                    todasTarefasPorDia.push({
+                                        projectId: project.id,
+                                        projectNome: project.nome,
+                                        nome: tarefa.nome,
+                                        data: dataStr,
+                                        dataInicio: tarefa.dataInicio,
+                                        dataFim: tarefa.dataFim,
+                                        status: statusDia,
+                                        responsavel: tarefa.responsavel
+                                    });
+                                    
+                                    currentDateLoop.setDate(currentDateLoop.getDate() + 1);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+            
+            let gridHtml = '';
+            for (let i = 0; i < startDay; i++) gridHtml += '<div class="calendar-day empty"></div>';
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const currentDateObj = new Date(year, month, day);
+                
+                const tarefasNestaData = todasTarefasPorDia.filter(t => t.data === dateStr);
+                const dayProjects = projects.filter(p => p.dataInicio === dateStr || p.dataTermino === dateStr);
+                
+                gridHtml += `<div class="calendar-day">
+                    <div class="day-number">${day}</div>`;
+                
+                tarefasNestaData.forEach(t => {
+                    const dataFimTarefa = new Date(t.dataFim);
+                    const diasRestantes = Math.ceil((dataFimTarefa - currentDateObj) / (1000 * 60 * 60 * 24));
+                    const isUrgent = t.status !== 'completed' && diasRestantes <= 2 && diasRestantes >= 0;
+                    
+                    let statusClass = '';
+                    let statusIcon = '';
+                    
+                    if (t.status === 'completed') {
+                        statusClass = 'completed';
+                        statusIcon = '✅';
+                    } else if (isUrgent) {
+                        statusClass = 'urgent';
+                        statusIcon = '🔴';
+                    } else {
+                        statusClass = 'pending';
+                        statusIcon = '⏳';
+                    }
+                    
+                    gridHtml += `<div class="calendar-event ${statusClass}" 
+                        onclick="alert('Tarefa: ${escapeHtml(t.nome)}\\nProjeto: ${escapeHtml(t.projectNome)}\\nStatus: ${t.status === 'completed' ? 'Concluída' : 'Pendente'}")"
+                        title="${escapeHtml(t.projectNome)}: ${escapeHtml(t.nome)}">
+                        ${statusIcon} ${escapeHtml(t.nome.substring(0, 12))}
+                    </div>`;
+                });
+                
+                dayProjects.forEach(p => {
+                    gridHtml += `<div class="calendar-event" style="background: #667eea;" title="${escapeHtml(p.nome)}">📌 ${escapeHtml(p.nome.substring(0, 18))}</div>`;
+                });
+                
+                gridHtml += `</div>`;
+            }
+            
+            const calendarGrid = document.getElementById('calendarGrid');
+            if (calendarGrid) calendarGrid.innerHTML = gridHtml;
+        }  
    
         function previousMonth() { 
             currentDate.setMonth(currentDate.getMonth() - 1); 
@@ -1131,7 +1094,6 @@
             let html = '';
             let totalTarefas = 0;
             let totalDias = 0;
-            let tarefasConcluidas = 0;
             
             fases.forEach(fase => {
                 html += `<div class="fase-item">
@@ -1143,8 +1105,6 @@
                 
                 tarefasData[fase.id].forEach((tarefa, idx) => {
                     totalTarefas++;
-                    
-                    if (tarefa.status === 'completed') tarefasConcluidas++;
                     
                     if (tarefa.dataInicio && tarefa.dataFim) {
                         const inicio = new Date(tarefa.dataInicio);
@@ -1171,18 +1131,6 @@
                 html += `</div>`;
             });
             
-            const percentualConcluido = totalTarefas > 0 ? Math.round((tarefasConcluidas / totalTarefas) * 100) : 0;
-            
-            html += `<div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <span><strong>✅ Tarefas Concluídas:</strong> ${tarefasConcluidas} / ${totalTarefas}</span>
-                    <span><strong>📊 Progresso:</strong> ${percentualConcluido}%</span>
-                    <div style="flex: 1; max-width: 200px; background: #ddd; border-radius: 10px; overflow: hidden;">
-                        <div style="width: ${percentualConcluido}%; height: 10px; background: #28a745;"></div>
-                    </div>
-                </div>
-            </div>`;
-            
             container.innerHTML = html;
             
             const totalTarefasElem = document.getElementById('totalTarefas');
@@ -1195,61 +1143,44 @@
         }
         
         function addTarefa() {
-    const nome = document.getElementById('novaTarefaNome')?.value.trim();
-    const fase = document.getElementById('novaTarefaFase')?.value;
-    const responsavel = document.getElementById('novaTarefaResp')?.value.trim();
-    const dataInicio = document.getElementById('novaTarefaDataInicio')?.value;
-    const dataFim = document.getElementById('novaTarefaDataFim')?.value;
-    
-    if (!nome) {
-        alert('Informe o nome da tarefa');
-        return;
-    }
-    
-    if (!dataInicio || !dataFim) {
-        alert('Informe as datas de início e fim da tarefa');
-        return;
-    }
-    
-    if (new Date(dataInicio) > new Date(dataFim)) {
-        alert('A data de fim deve ser posterior à data de início');
-        return;
-    }
-    
-    // Inicializar statusPorDia para cada dia do período
-    const statusPorDia = {};
-    const startDate = new Date(dataInicio);
-    const endDate = new Date(dataFim);
-    const currentDateLoop = new Date(startDate);
-    
-    while (currentDateLoop <= endDate) {
-        const ano = currentDateLoop.getFullYear();
-        const mes = String(currentDateLoop.getMonth() + 1).padStart(2, '0');
-        const dia = String(currentDateLoop.getDate()).padStart(2, '0');
-        const dataStr = `${ano}-${mes}-${dia}`;
-        statusPorDia[dataStr] = 'pending';
-        currentDateLoop.setDate(currentDateLoop.getDate() + 1);
-    }
-    
-    tarefasData[fase].push({ 
-        id: `${currentProjectId || Date.now()}_${nome.replace(/\s/g, '_')}_${dataInicio}_${dataFim}`,
-        nome, 
-        responsavel: responsavel || '-', 
-        dataInicio: dataInicio,
-        dataFim: dataFim,
-        prazo: `${dataInicio} até ${dataFim}`,
-        status: 'pending',
-        statusPorDia: statusPorDia
-    });
-    
-    document.getElementById('novaTarefaNome').value = '';
-    document.getElementById('novaTarefaResp').value = '';
-    document.getElementById('novaTarefaDataInicio').value = '';
-    document.getElementById('novaTarefaDataFim').value = '';
-    
-    renderCronograma();
-    renderCalendar();
-}
+            const nome = document.getElementById('novaTarefaNome')?.value.trim();
+            const fase = document.getElementById('novaTarefaFase')?.value;
+            const responsavel = document.getElementById('novaTarefaResp')?.value.trim();
+            const dataInicio = document.getElementById('novaTarefaDataInicio')?.value;
+            const dataFim = document.getElementById('novaTarefaDataFim')?.value;
+            
+            if (!nome) {
+                alert('Informe o nome da tarefa');
+                return;
+            }
+            
+            if (!dataInicio || !dataFim) {
+                alert('Informe as datas de início e fim da tarefa');
+                return;
+            }
+            
+            if (new Date(dataInicio) > new Date(dataFim)) {
+                alert('A data de fim deve ser posterior à data de início');
+                return;
+            }
+            
+            tarefasData[fase].push({ 
+                nome, 
+                responsavel: responsavel || '-', 
+                dataInicio: dataInicio,
+                dataFim: dataFim,
+                prazo: `${dataInicio} até ${dataFim}`,
+                status: 'pending'
+            });
+            
+            document.getElementById('novaTarefaNome').value = '';
+            document.getElementById('novaTarefaResp').value = '';
+            document.getElementById('novaTarefaDataInicio').value = '';
+            document.getElementById('novaTarefaDataFim').value = '';
+            
+            renderCronograma();
+            renderCalendar();
+        }
         
         function removeTarefa(fase, idx) { 
             tarefasData[fase].splice(idx, 1); 
@@ -1262,34 +1193,15 @@
             renderCronograma(); 
         }
         
-       function loadCronogramaData(data) { 
-    if (data) {
-        Object.keys(data).forEach(fase => {
-            data[fase].forEach((tarefa, idx) => {
-                if (!tarefa.status) tarefa.status = 'pending';
-                if (!tarefa.statusPorDia) {
-                    tarefa.statusPorDia = {};
-                    const startDate = new Date(tarefa.dataInicio);
-                    const endDate = new Date(tarefa.dataFim);
-                    const currentDateLoop = new Date(startDate);
-                    
-                    while (currentDateLoop <= endDate) {
-                        const ano = currentDateLoop.getFullYear();
-                        const mes = String(currentDateLoop.getMonth() + 1).padStart(2, '0');
-                        const dia = String(currentDateLoop.getDate()).padStart(2, '0');
-                        const dataStr = `${ano}-${mes}-${dia}`;
-                        tarefa.statusPorDia[dataStr] = tarefa.status || 'pending';
-                        currentDateLoop.setDate(currentDateLoop.getDate() + 1);
-                    }
-                }
-            });
-        });
-        tarefasData = data;
-    } else {
-        tarefasData = { pre: [], prod: [], pos: [] };
-    }
-    renderCronograma(); 
-}
+        function loadCronogramaData(data) { 
+            if (data) {
+                tarefasData = data;
+            } else {
+                tarefasData = { pre: [], prod: [], pos: [] };
+            }
+            renderCronograma(); 
+        }
+        
         // ========== FUNÇÕES DE ORÇAMENTO ==========
         function calcularValorTotal() {
             const quantidade = parseFloat(document.getElementById('quantidadeItem')?.value) || 0;
@@ -1321,7 +1233,6 @@
             
             if (!descricao) { alert('Informe a descrição do item'); return; }
             if (quantidade <= 0) { alert('Informe uma quantidade válida'); return; }
-            if (qtdUnidade <= 0) { alert('Informe a quantidade de unidade válida'); return; }
             if (valorUnitario <= 0) { alert('Informe um valor unitário válido'); return; }
             
             budgetItems.push({ numero, descricao, categoria, quantidade, unidade, qtdUnidade, valorUnitario, valorTotal });
@@ -1352,60 +1263,30 @@
             const container = document.getElementById('budgetContainer');
             if (!container) return;
             
-            const categoriasOrdenadas = [
-                "1. Profissionais da área", "2. Prestadores de serviços", "3. Equipamentos, materiais, estruturas",
-                "4. Logística", "5. Divulgação, mídia e comunicação", "6. Ações de acessibilidade",
-                "7. Custo Administrativo", "8. Taxas e serviços"
-            ];
-            
             let totalGeral = 0;
-            let html = '';
+            let html = '<table class="budget-table"><thead><tr><th>Nº</th><th>Descrição</th><th>Categoria</th><th>Qtd</th><th>Unid</th><th>Valor Unit.</th><th>Valor Total</th><th></th></tr></thead><tbody>';
             
-            categoriasOrdenadas.forEach(cat => {
-                const itensCat = budgetItems.filter(item => item.categoria === cat);
-                if (itensCat.length > 0) {
-                    html += `<div class="budget-category">
-                        <h4>${cat}</h4>
-                        <table class="budget-table">
-                            <thead>
-                                <tr><th>Nº</th><th>Descrição</th><th>Quantidade</th><th>Unidade</th><th>Qtd Unid.</th><th>Valor Unit.</th><th>Valor Total</th><th></th></tr>
-                            </thead>
-                            <tbody>`;
-                    
-                    let subtotal = 0;
-                    itensCat.forEach((item, idx) => {
-                        const idxGlobal = budgetItems.findIndex(i => i === item);
-                        subtotal += item.valorTotal;
-                        html += `<tr>
-                            <td>${escapeHtml(item.numero)}</td>
-                            <td>${escapeHtml(item.descricao)}</td>
-                            <td>${item.quantidade}</td>
-                            <td>${escapeHtml(item.unidade)}</td>
-                            <td>${item.qtdUnidade}</td>
-                            <td>R$ ${formatarMoedaBrasileira(item.valorUnitario)}</td>
-                            <td>R$ ${formatarMoedaBrasileira(item.valorTotal)}</td>
-                            <td><button class="remove-tarefa" onclick="removeBudgetItem(${idxGlobal})">🗑️</button></td>
-                        </tr>`;
-                    });
-                    
-                    html += `<tr style="background:#f0f0f0;"><td colspan="6" style="text-align:right;"><strong>Subtotal:</strong></td>
-                             <td colspan="2"><strong>R$ ${formatarMoedaBrasileira(subtotal)}</strong></td>
-                          </tr>`;
-                    html += `</tbody>
-                        </table>
-                    </div>`;
-                    totalGeral += subtotal;
-                }
+            budgetItems.forEach((item, idx) => {
+                totalGeral += item.valorTotal;
+                html += `<tr>
+                    <td>${escapeHtml(item.numero)}</td>
+                    <td>${escapeHtml(item.descricao)}</td>
+                    <td>${escapeHtml(item.categoria)}</td>
+                    <td>${item.quantidade}</td>
+                    <td>${escapeHtml(item.unidade)}</td>
+                    <td>R$ ${formatarMoedaBrasileira(item.valorUnitario)}</td>
+                    <td>R$ ${formatarMoedaBrasileira(item.valorTotal)}</td>
+                    <td><button class="remove-tarefa" onclick="removeBudgetItem(${idx})">🗑️</button></td>
+                </tr>`;
             });
             
             if (budgetItems.length === 0) {
                 html = '<p style="text-align:center; color:#999; padding:20px;">Nenhum item cadastrado. Adicione itens abaixo.</p>';
+            } else {
+                html += `<tr style="background:#f0f0f0;"><td colspan="6" style="text-align:right;"><strong>TOTAL GERAL:</strong></td>
+                         <td colspan="2"><strong>R$ ${formatarMoedaBrasileira(totalGeral)}</strong></td>
+                       </tr></tbody></table>`;
             }
-            
-            html += `<div style="text-align: center; background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); padding: 15px; border-radius: 12px; margin-top: 20px;">
-                <span style="font-size: 18px;">💰 TOTAL GERAL:</span>
-                <strong style="font-size: 24px; color: #667eea; margin-left: 15px;">R$ ${formatarMoedaBrasileira(totalGeral)}</strong>
-            </div>`;
             
             container.innerHTML = html;
         }
@@ -1423,33 +1304,12 @@
             row.className = 'item-row';
             row.id = rowId;
             
-            let selectHTML = `<select class="select-peca" data-row-id="${rowId}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">
-                <option value="">Selecione uma peça...</option>`;
-            opcoesPecas.forEach(opcao => {
-                selectHTML += `<option value="${opcao}" ${opcao === pecaSelecionada ? 'selected' : ''}>${opcao}</option>`;
-            });
-            selectHTML += `</select>`;
-            selectHTML += `<input type="text" class="input-peca-manual" placeholder="Ou digite uma peça personalizada..." data-row-id="${rowId}" value="${escapeHtml(pecaSelecionada && !opcoesPecas.includes(pecaSelecionada) ? pecaSelecionada : '')}" style="width: 100%; margin-top: 8px; padding: 8px; border: 1px solid #ddd; border-radius: 6px;">`;
-            
             row.innerHTML = `
-                <div><label style="font-size:12px;color:#666;">📌 Peça de Divulgação</label>${selectHTML}</div>
-                <div><label style="font-size:12px;color:#666;">⚙️ Especificações Técnicas</label>
-                <textarea class="especificacao-textarea" data-row-id="${rowId}" rows="3" placeholder="Descreva as especificações técnicas..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">${escapeHtml(especificacao)}</textarea></div>
-                <div><button type="button" class="btn-remove" onclick="removerLinhaDivulgacao('${rowId}')" style="margin-top:24px;">🗑️</button></div>
+                <div><input type="text" class="input-peca-manual" placeholder="Nome da peça de divulgação" data-row-id="${rowId}" value="${escapeHtml(pecaSelecionada)}" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"></div>
+                <div><textarea class="especificacao-textarea" data-row-id="${rowId}" rows="3" placeholder="Descreva as especificações técnicas..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">${escapeHtml(especificacao)}</textarea></div>
+                <div><button type="button" class="btn-remove" onclick="removerLinhaDivulgacao('${rowId}')" style="margin-top:0;">🗑️</button></div>
             `;
             container.appendChild(row);
-            
-            const select = row.querySelector('.select-peca');
-            const inputManual = row.querySelector('.input-peca-manual');
-            if (select && inputManual) {
-                select.addEventListener('change', function() { if (this.value) inputManual.value = this.value; });
-                inputManual.addEventListener('input', function() {
-                    if (this.value) {
-                        const optionExists = Array.from(select.options).some(opt => opt.value === this.value);
-                        select.value = optionExists ? this.value : "";
-                    } else { select.value = ""; }
-                });
-            }
         }
         
         function removerLinhaDivulgacao(rowId) { const row = document.getElementById(rowId); if (row) row.remove(); }
@@ -1474,7 +1334,6 @@
             } else {
                 adicionarLinhaDivulgacao("Redes Sociais", "Posts diários no Instagram e Facebook");
                 adicionarLinhaDivulgacao("Banners", "Banner para site 728x90px");
-                adicionarLinhaDivulgacao("Telão de LED", "Vídeo 30 segundos, resolução 1920x1080p");
             }
         }
         
@@ -1493,96 +1352,11 @@
                     </select>
                 </div>
             </div>`;
-            
-            if (categoria === 'audiovisual') {
-                html += `<div class="spec-group"><h4>🎬 Especificações Audiovisuais</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Formato:</label><select id="projFormato" style="width:100%; padding:10px;"><option value="">Selecione...</option>${formatosAudiovisual.map(f => `<option value="${f}">${f}</option>`).join('')}</select></div>
-                        <div class="spec-field"><label>Tom / Estilo:</label><input type="text" id="projTom" placeholder="Ex: Sombrio, Leve..." style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Nº Episódios:</label><input type="number" id="projEpisodios" placeholder="Ex: 10" style="width:100%; padding:10px;"></div>
-                        <div class="spec-field"><label>Duração por Episódio (min):</label><input type="number" id="projDuracaoEp" placeholder="Ex: 45" style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-field"><label>Temporadas:</label><select id="projTemporadas" style="width:100%; padding:10px;">${[1,2,3,4,5].map(t => `<option value="${t}">${t}ª Temporada</option>`).join('')}</select></div>
-                </div>`;
-            }
-            if (categoria === 'teatro') {
-                html += `<div class="spec-group"><h4>🎭 Especificações Teatrais</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Tipo:</label><select id="projTipoTeatro" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="profissional">Profissional</option><option value="amador">Amador</option><option value="infantil">Infantil</option><option value="rua">Teatro de Rua</option></select></div>
-                        <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoTeatro" placeholder="Ex: 90" style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-field"><label>Nº Atores:</label><input type="number" id="projNumAtores" placeholder="Ex: 5" style="width:100%; padding:10px;"></div>
-                </div>`;
-            }
-            if (categoria === 'musica') {
-                html += `<div class="spec-group"><h4>🎵 Especificações Musicais</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Tipo:</label><select id="projTipoMusica" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="show">Show ao vivo</option><option value="festival">Festival</option><option value="grabacao">Gravação</option><option value="turnê">Turnê</option></select></div>
-                        <div class="spec-field"><label>Nº Músicas:</label><input type="number" id="projNumMusicas" placeholder="Ex: 15" style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoShow" placeholder="Ex: 120" style="width:100%; padding:10px;"></div>
-                </div>`;
-            }
-            if (categoria === 'circo') {
-                html += `<div class="spec-group"><h4>🎪 Especificações Circenses</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Modalidade:</label><select id="projModalidadeCirco" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="palhaco">Palhaçaria</option><option value="acrobata">Acrobacia</option><option value="malabarista">Malabarismo</option><option value="magico">Mágica</option><option value="trapezio">Trapézio</option></select></div>
-                        <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoCirco" placeholder="Ex: 60" style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-field"><label>Nº Artistas:</label><input type="number" id="projNumArtistas" placeholder="Ex: 8" style="width:100%; padding:10px;"></div>
-                </div>`;
-            }
             container.innerHTML = html;
         }
         
-        function loadSpecificationsData(project) {
-            if (!project?.especificacoes) return;
-            const specs = project.especificacoes;
-            if (document.getElementById('projGenero') && specs.genero) document.getElementById('projGenero').value = specs.genero;
-            if (specs.formato && document.getElementById('projFormato')) document.getElementById('projFormato').value = specs.formato;
-            if (specs.tom && document.getElementById('projTom')) document.getElementById('projTom').value = specs.tom;
-            if (specs.episodios && document.getElementById('projEpisodios')) document.getElementById('projEpisodios').value = specs.episodios;
-            if (specs.duracaoEp && document.getElementById('projDuracaoEp')) document.getElementById('projDuracaoEp').value = specs.duracaoEp;
-            if (specs.temporadas && document.getElementById('projTemporadas')) document.getElementById('projTemporadas').value = specs.temporadas;
-            if (specs.tipoTeatro && document.getElementById('projTipoTeatro')) document.getElementById('projTipoTeatro').value = specs.tipoTeatro;
-            if (specs.duracaoTeatro && document.getElementById('projDuracaoTeatro')) document.getElementById('projDuracaoTeatro').value = specs.duracaoTeatro;
-            if (specs.numAtores && document.getElementById('projNumAtores')) document.getElementById('projNumAtores').value = specs.numAtores;
-            if (specs.tipoMusica && document.getElementById('projTipoMusica')) document.getElementById('projTipoMusica').value = specs.tipoMusica;
-            if (specs.numMusicas && document.getElementById('projNumMusicas')) document.getElementById('projNumMusicas').value = specs.numMusicas;
-            if (specs.duracaoShow && document.getElementById('projDuracaoShow')) document.getElementById('projDuracaoShow').value = specs.duracaoShow;
-            if (specs.modalidadeCirco && document.getElementById('projModalidadeCirco')) document.getElementById('projModalidadeCirco').value = specs.modalidadeCirco;
-            if (specs.duracaoCirco && document.getElementById('projDuracaoCirco')) document.getElementById('projDuracaoCirco').value = specs.duracaoCirco;
-            if (specs.numArtistas && document.getElementById('projNumArtistas')) document.getElementById('projNumArtistas').value = specs.numArtistas;
-        }
-        
         function getSpecificationsData() {
-            const categoria = document.getElementById('projCategoria')?.value;
-            const especificacoes = { genero: document.getElementById('projGenero')?.value || '' };
-            if (categoria === 'audiovisual') {
-                especificacoes.formato = document.getElementById('projFormato')?.value || '';
-                especificacoes.tom = document.getElementById('projTom')?.value || '';
-                especificacoes.episodios = document.getElementById('projEpisodios')?.value || '';
-                especificacoes.duracaoEp = document.getElementById('projDuracaoEp')?.value || '';
-                especificacoes.temporadas = document.getElementById('projTemporadas')?.value || '';
-            }
-            if (categoria === 'teatro') {
-                especificacoes.tipoTeatro = document.getElementById('projTipoTeatro')?.value || '';
-                especificacoes.duracaoTeatro = document.getElementById('projDuracaoTeatro')?.value || '';
-                especificacoes.numAtores = document.getElementById('projNumAtores')?.value || '';
-            }
-            if (categoria === 'musica') {
-                especificacoes.tipoMusica = document.getElementById('projTipoMusica')?.value || '';
-                especificacoes.numMusicas = document.getElementById('projNumMusicas')?.value || '';
-                especificacoes.duracaoShow = document.getElementById('projDuracaoShow')?.value || '';
-            }
-            if (categoria === 'circo') {
-                especificacoes.modalidadeCirco = document.getElementById('projModalidadeCirco')?.value || '';
-                especificacoes.duracaoCirco = document.getElementById('projDuracaoCirco')?.value || '';
-                especificacoes.numArtistas = document.getElementById('projNumArtistas')?.value || '';
-            }
-            return especificacoes;
+            return { genero: document.getElementById('projGenero')?.value || '' };
         }
         
         // ========== FUNÇÕES DE PROJETO ==========
@@ -1645,7 +1419,7 @@
             loadDivulgacaoData(project.pecasDivulgacao || null);
             loadCronogramaData(project.cronograma || { pre: [], prod: [], pos: [] });
             loadBudgetData(project.orcamento || []);
-            setTimeout(() => { updateSpecifications(); loadSpecificationsData(project); }, 100);
+            setTimeout(() => { updateSpecifications(); }, 100);
         }
         
         function saveCurrentProject() {
@@ -1714,38 +1488,19 @@
             }
         }
         
-        function escapeHtml(str) { 
-            if (!str) return ''; 
-            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); 
-        }
-        
         function viewProject(projectId) {
             const projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
             const project = projects.find(p => p.id == projectId);
             if (!project) return;
             const viewModal = document.createElement('div');
             viewModal.className = 'view-modal';
-            const categorias = { 'audiovisual': 'Audiovisual', 'teatro': 'Teatro', 'musica': 'Música', 'artes_visuais': 'Artes Visuais', 'alimentos': 'Alimentos', 'esportes': 'Esportes', 'educacao': 'Educação', 'circo': 'Circo' };
-            let specsHtml = '';
-            if (project.especificacoes) {
-                const specs = project.especificacoes;
-                specsHtml = '<div style="margin-bottom:20px;"><h3 style="color:#667eea;">🎬 Especificações</h3>';
-                if (specs.genero) specsHtml += `<p><strong>Gênero:</strong> ${escapeHtml(specs.genero)}</p>`;
-                if (specs.formato) specsHtml += `<p><strong>Formato:</strong> ${escapeHtml(specs.formato)}</p>`;
-                if (specs.tom) specsHtml += `<p><strong>Tom/Estilo:</strong> ${escapeHtml(specs.tom)}</p>`;
-                if (specs.episodios) specsHtml += `<p><strong>Episódios:</strong> ${specs.episodios}</p>`;
-                if (specs.duracaoEp) specsHtml += `<p><strong>Duração por Episódio:</strong> ${specs.duracaoEp} min</p>`;
-                if (specs.temporadas) specsHtml += `<p><strong>Temporadas:</strong> ${specs.temporadas}ª</p>`;
-                specsHtml += '</div>';
-            }
             viewModal.innerHTML = `<div style="background:white; border-radius:15px; width:90%; max-width:800px; max-height:90%; overflow-y:auto; padding:25px; position:relative; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #667eea; padding-bottom:10px;">
                     <h2 style="margin:0; color:#667eea;">📄 ${escapeHtml(project.nome)}</h2>
                     <button onclick="this.closest('.view-modal').remove()" style="background:#dc3545; color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">&times;</button>
                 </div>
-                <div style="margin-bottom:20px;"><span style="background:#667eea; color:white; padding:5px 12px; border-radius:20px;">${categorias[project.categoria] || project.categoria}</span>
+                <div style="margin-bottom:20px;"><span style="background:#667eea; color:white; padding:5px 12px; border-radius:20px;">${project.categoria}</span>
                 <span style="margin-left:10px; color:#666;">📅 ${project.dataInicio || '—'} até ${project.dataTermino || '—'}</span></div>
-                ${specsHtml}
                 ${project.objetivo ? `<div style="margin-bottom:20px;"><h3 style="color:#667eea;">🎯 Objetivo</h3><p>${escapeHtml(project.objetivo)}</p></div>` : ''}
                 ${project.sinopse ? `<div style="margin-bottom:20px;"><h3 style="color:#667eea;">📖 Sinopse</h3><p>${escapeHtml(project.sinopse)}</p></div>` : ''}
                 <div style="margin-top:30px; text-align:center; color:#999;">Documento gerado pelo Sistema de Gestão de Projetos Culturais</div>
@@ -1771,20 +1526,13 @@
         }
         
         function checkLogin() {
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
-            if (!currentUser) { 
-                window.location.href = 'login.html'; 
-                return; 
-            }
-            const userNameDisplay = document.getElementById('userNameDisplay');
-            if (userNameDisplay) userNameDisplay.textContent = currentUser.name;
             loadProjectsList();
             renderCalendar();
+            document.getElementById('userNameDisplay').textContent = 'Usuário Demo';
         }
         
         function doLogout() { 
-            sessionStorage.removeItem('currentUser'); 
-            window.location.href = 'login.html'; 
+            alert('Logout realizado'); 
         }
         
         function switchTab(tabName) {
@@ -1793,168 +1541,12 @@
             tabs.forEach(tab => tab.classList.remove('active'));
             contents.forEach(content => content.classList.remove('active'));
             
-            const tabIndex = { 'info': 0, 'especificacoes': 1, 'cronograma': 2, 'budget': 3, 'comunicacao': 4 };
-            if (tabs[tabIndex[tabName]]) tabs[tabIndex[tabName]].classList.add('active');
+            const tabIds = { 'info': 'tabInfo', 'especificacoes': 'tabEspecificacoes', 'cronograma': 'tabCronograma', 'budget': 'tabBudget', 'comunicacao': 'tabComunicacao' };
+            const activeContent = document.getElementById(tabIds[tabName]);
+            if (activeContent) activeContent.classList.add('active');
             
-            const contentId = { 'info': 'tabInfo', 'especificacoes': 'tabEspecificacoes', 'cronograma': 'tabCronograma', 'budget': 'tabBudget', 'comunicacao': 'tabComunicacao' };
-            const content = document.getElementById(contentId[tabName]);
-            if (content) content.classList.add('active');
-        }
-        
-        // ========== FUNÇÕES DE STATUS DAS TAREFAS ==========
-        
-        // Função para alternar o status da tarefa por DIA específico
-function toggleTaskStatusByDay(taskId, projectId, taskNome, currentStatus, dataEspecifica, dataInicio, dataFim) {
-    const modal = document.createElement('div');
-    modal.className = 'task-status-modal';
-    modal.innerHTML = `
-        <div class="task-status-content">
-            <h3>📋 ${escapeHtml(taskNome)}</h3>
-            <p style="font-size: 12px; color: #666;">📅 Data: <strong>${dataEspecifica}</strong></p>
-            <p style="font-size: 12px; color: #666;">Período da tarefa: ${dataInicio} até ${dataFim}</p>
-            <p>Status atual nesta data: <strong>${currentStatus === 'completed' ? '✅ Concluída' : '⏳ Pendente'}</strong></p>
-            <p>Alterar status APENAS para o dia <strong>${dataEspecifica}</strong>?</p>
-            <div class="task-status-buttons">
-                ${currentStatus !== 'completed' ? 
-                    `<button class="btn-mark-complete" onclick="marcarDiaTarefaConcluido(${projectId}, '${escapeHtml(taskNome)}', '${dataEspecifica}')">✓ Marcar este dia como Concluído</button>` : 
-                    `<button class="btn-mark-pending" onclick="marcarDiaTarefaPendente(${projectId}, '${escapeHtml(taskNome)}', '${dataEspecifica}')">⏳ Marcar este dia como Pendente</button>`
-                }
-                <button class="btn-close-status" onclick="this.closest('.task-status-modal').remove()">Fechar</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.remove();
-    });
-}
-
-// Função para marcar um DIA específico da tarefa como concluído
-function marcarDiaTarefaConcluido(projectId, taskNome, dataEspecifica) {
-    let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
-    const projectIndex = projects.findIndex(p => p.id == projectId);
-    
-    if (projectIndex !== -1) {
-        const project = projects[projectIndex];
-        let tarefaEncontrada = false;
-        
-        if (project.cronograma) {
-            for (let fase in project.cronograma) {
-                const tarefaIndex = project.cronograma[fase].findIndex(t => t.nome === taskNome);
-                
-                if (tarefaIndex !== -1) {
-                    const tarefa = project.cronograma[fase][tarefaIndex];
-                    if (!tarefa.statusPorDia) tarefa.statusPorDia = {};
-                    tarefa.statusPorDia[dataEspecifica] = 'completed';
-                    tarefaEncontrada = true;
-                    break;
-                }
-            }
-        }
-        
-        if (tarefaEncontrada) {
-            projects[projectIndex] = project;
-            localStorage.setItem('cultureProjects', JSON.stringify(projects));
-            
-            if (currentProjectId == projectId) {
-                // Atualizar dados locais também
-                loadCronogramaData(project.cronograma);
-            }
-            
-            alert(`✅ Dia ${dataEspecifica} da tarefa "${taskNome}" marcado como CONCLUÍDO!`);
-            renderCalendar();
-            loadProjectsList();
-            
-            document.querySelectorAll('.task-status-modal').forEach(m => m.remove());
-        } else {
-            alert('Erro: Tarefa não encontrada!');
-        }
-    }
-}
-
-// Função para marcar um DIA específico da tarefa como pendente
-function marcarDiaTarefaPendente(projectId, taskNome, dataEspecifica) {
-    let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
-    const projectIndex = projects.findIndex(p => p.id == projectId);
-    
-    if (projectIndex !== -1) {
-        const project = projects[projectIndex];
-        let tarefaEncontrada = false;
-        
-        if (project.cronograma) {
-            for (let fase in project.cronograma) {
-                const tarefaIndex = project.cronograma[fase].findIndex(t => t.nome === taskNome);
-                
-                if (tarefaIndex !== -1) {
-                    const tarefa = project.cronograma[fase][tarefaIndex];
-                    if (!tarefa.statusPorDia) tarefa.statusPorDia = {};
-                    tarefa.statusPorDia[dataEspecifica] = 'pending';
-                    tarefaEncontrada = true;
-                    break;
-                }
-            }
-        }
-        
-        if (tarefaEncontrada) {
-            projects[projectIndex] = project;
-            localStorage.setItem('cultureProjects', JSON.stringify(projects));
-            
-            if (currentProjectId == projectId) {
-                loadCronogramaData(project.cronograma);
-            }
-            
-            alert(`⏳ Dia ${dataEspecifica} da tarefa "${taskNome}" marcado como PENDENTE!`);
-            renderCalendar();
-            loadProjectsList();
-            
-            document.querySelectorAll('.task-status-modal').forEach(m => m.remove());
-        } else {
-            alert('Erro: Tarefa não encontrada!');
-        }
-    }
-}
-
-        function marcarTarefaPendente(taskId, projectId, dataInicio, dataFim) {
-            let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
-            const projectIndex = projects.findIndex(p => p.id == projectId);
-            
-            if (projectIndex !== -1) {
-                const project = projects[projectIndex];
-                let tarefaEncontrada = false;
-                
-                if (project.cronograma) {
-                    for (let fase in project.cronograma) {
-                        const tarefaIndex = project.cronograma[fase].findIndex(t => {
-                            return t.id === taskId || 
-                                   (t.nome === taskId.split('_')[1] && t.dataInicio === dataInicio && t.dataFim === dataFim);
-                        });
-                        
-                        if (tarefaIndex !== -1) {
-                            project.cronograma[fase][tarefaIndex].status = 'pending';
-                            tarefaEncontrada = true;
-                            break;
-                        }
-                    }
-                }
-                
-                if (tarefaEncontrada) {
-                    projects[projectIndex] = project;
-                    localStorage.setItem('cultureProjects', JSON.stringify(projects));
-                    
-                    if (currentProjectId == projectId) {
-                        loadCronogramaData(project.cronograma);
-                    }
-                    
-                    alert('⏳ Tarefa marcada como PENDENTE para este período!');
-                    renderCalendar();
-                    loadProjectsList();
-                    
-                    document.querySelectorAll('.task-status-modal').forEach(m => m.remove());
-                } else {
-                    alert('Erro: Tarefa não encontrada!');
-                }
-            }
+            const activeTab = Array.from(tabs).find(tab => tab.textContent.includes(tabName.charAt(0).toUpperCase() + tabName.slice(1)));
+            if (activeTab) activeTab.classList.add('active');
         }
         
         // ========== INICIALIZAÇÃO ==========
