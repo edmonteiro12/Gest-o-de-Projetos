@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Sistema</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 400px; text-align: center; }
+        .login-box h2 { color: #333; margin-bottom: 30px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .login-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .login-box button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .error-msg { color: red; margin-top: 10px; font-size: 14px; }
+
+        .admin-panel { display: none; padding: 20px; background: #f8f9fa; min-height: 100vh; }
+        .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logout-btn { background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab { padding: 10px 20px; cursor: pointer; background: #e9ecef; border-radius: 8px 8px 0 0; }
+        .tab.active { background: #667eea; color: white; }
+
+        .tab-content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        button:hover { background: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .status { padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+        .ativo { background: #d4edda; color: #155724; }
+        .bloqueado { background: #f8d7da; color: #721c24; }
+        .btn-small { padding: 5px 12px; margin: 2px; font-size: 12px; background: #0066cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-small:hover { background: #0052a3; }
+        .btn-edit { background: #007bff; }
+        .btn-block { background: #dc3545; }
+        .btn-unlock { background: #28a745; }
+        .modal-edit { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-edit.show { display: flex; }
+        .modal-edit-content { background: white; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .modal-edit-content h3 { margin-top: 0; color: #333; }
+        .close-modal-edit { float: right; font-size: 24px; cursor: pointer; color: #999; }
+        .close-modal-edit:hover { color: #000; }
+        .history-item { background: #f9f9f9; padding: 15px; margin: 10px 0; border-left: 4px solid #667eea; border-radius: 5px; }
+        .history-time { font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <h2>🔐 Login Admin</h2>
+            <input type="text" id="adminLogin" placeholder="Login" value="admin">
+            <input type="password" id="adminPass" placeholder="Senha">
+            <button onclick="doAdminLogin()">Entrar</button>
+            <div id="adminError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <div id="adminPanel" class="admin-panel">
+        <div class="header">
+            <div class="logo">🎭 Painel Admin</div>
+            <button class="logout-btn" onclick="doAdminLogout()">Sair</button>
+        </div>
+        <div style="padding: 20px;">
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('cadastro')">Cadastro</div>
+                <div class="tab" onclick="showTab('gerenciar')">Gerenciar Usuários</div>
+                <div class="tab" onclick="showTab('historico')">Histórico</div>
+            </div>
+            <div id="cadastro" class="tab-content">
+                <h3>Criar Novo Usuário</h3>
+                <form id="userForm">
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="documento">CNPJ ou CPF:</label>
+                        <input type="text" id="documento" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login">Login:</label>
+                        <input type="text" id="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="senha">Senha:</label>
+                        <input type="password" id="senha" required>
+                    </div>
+                    <button type="submit">Criar Usuário</button>
+                </form>
+            </div>
+            <div id="gerenciar" class="tab-content" style="display: none;">
+                <h3>Gerenciar Usuários Cadastrados</h3>
+                <table id="gerenciarTable">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Login</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="historico" class="tab-content" style="display: none;">
+                <h3>Histórico de Atualizações</h3>
+                <div id="historicoContainer" style="max-height: 500px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR SENHA -->
+    <div id="editPasswordModal" class="modal-edit">
+        <div class="modal-edit-content">
+            <span class="close-modal-edit" onclick="closeEditModal()">&times;</span>
+            <h3>Editar Senha</h3>
+            <form id="editPasswordForm">
+                <div class="form-group">
+                    <label for="editUserLogin">Login:</label>
+                    <input type="text" id="editUserLogin" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">Nova Senha:</label>
+                    <input type="password" id="editPassword" required>
+                </div>
+                <button type="submit" style="width: 100%; margin-top: 15px;">Atualizar Senha</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentEditingUser = null;
+        const ADMIN_PASSWORD = 'admin123'; // Alterar em produção
+
+        // Sincronizar usuários com index
+        function syncUsersWithIndex() {
+            const adminUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            let cultureUsers = JSON.parse(localStorage.getItem('cultureUsers') || '[]');
+            let atualizado = false;
+            
+            adminUsers.forEach(adminUser => {
+                if (adminUser.status !== 'bloqueado') {
+                    const existe = cultureUsers.find(u => u.email === adminUser.login);
+                    if (!existe) {
+                        cultureUsers.push({
+                            email: adminUser.login,
+                            password: adminUser.senha,
+                            name: adminUser.nome
+                        });
+                        atualizado = true;
+                    } else if (existe.password !== adminUser.senha) {
+                        existe.password = adminUser.senha;
+                        atualizado = true;
+                    }
+                }
+            });
+            
+            if (atualizado) {
+                localStorage.setItem('cultureUsers', JSON.stringify(cultureUsers));
+                console.log('Usuários sincronizados com o sistema principal');
+            }
+        }
+
+        // Login Admin
+        function doAdminLogin() {
+            const login = document.getElementById('adminLogin').value;
+            const password = document.getElementById('adminPass').value;
+            const errorDiv = document.getElementById('adminError');
+
+            if (login === 'admin' && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminLogado', 'true');
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadUsers();
+                loadHistory();
+                errorDiv.textContent = '';
+            } else {
+                errorDiv.textContent = 'Login ou senha incorretos!';
+            }
+        }
+
+        // Logout Admin
+        function doAdminLogout() {
+            sessionStorage.removeItem('adminLogado');
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminPass').value = '';
+            document.getElementById('adminError').textContent = '';
+        }
+
+        // Mostrar aba
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.style.display = 'none');
+            document.getElementById(tabName).style.display = 'block';
+
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tabName === 'gerenciar') {
+                loadUsers();
+            } else if (tabName === 'historico') {
+                loadHistory();
+            }
+        }
+
+        // Carregar usuários
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const tbody = document.querySelector('#gerenciarTable tbody');
+            tbody.innerHTML = '';
+
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                const statusClass = user.status === 'ativo' ? 'ativo' : 'bloqueado';
+                row.innerHTML = `
+                    <td>${user.nome}</td>
+                    <td>${user.login}</td>
+                    <td><span class="status ${statusClass}">${user.status}</span></td>
+                    <td>
+                        <button class="btn-small btn-edit" onclick="editPassword(${index})">Editar Senha</button>
+                        <button class="btn-small btn-block" onclick="toggleStatus(${index})">${user.status === 'bloqueado' ? 'Desbloquear' : 'Bloquear'}</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Editar senha
+        function editPassword(index) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            currentEditingUser = index;
+            document.getElementById('editUserLogin').value = users[index].login;
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editPasswordModal').classList.add('show');
+        }
+
+        // Fechar modal
+        function closeEditModal() {
+            document.getElementById('editPasswordModal').classList.remove('show');
+            currentEditingUser = null;
+        }
+
+        // Alternar status
+        function toggleStatus(index) {
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            users[index].status = users[index].status === 'bloqueado' ? 'ativo' : 'bloqueado';
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            syncUsersWithIndex();
+            
+            const action = users[index].status === 'bloqueado' ? 'bloqueado' : 'desbloqueado';
+            addToHistory(`${users[index].nome} (${users[index].login}) foi ${action}`);
+            
+            loadUsers();
+        }
+
+        // Adicionar ao histórico
+        function addToHistory(message) {
+            let history = JSON.parse(localStorage.getItem('adminHistory') || '[]');
+            const timestamp = new Date().toLocaleString('pt-BR');
+            history.push({ message, timestamp });
+            localStorage.setItem('adminHistory', JSON.stringify(history));
+        }
+
+        // Carregar histórico
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('adminHistory') || '[]');
+            const container = document.getElementById('historicoContainer');
+            container.innerHTML = '';
+
+            if (history.length === 0) {
+                container.innerHTML = '<p>Sem histórico de atualizações</p>';
+                return;
+            }
+
+            history.reverse().forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <strong>${item.message}</strong>
+                    <div class="history-time">${item.timestamp}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Formulário de criar usuário
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const documento = document.getElementById('documento').value;
+            const login = document.getElementById('login').value;
+            const senha = document.getElementById('senha').value;
+
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const existingUser = users.find(u => u.login === login);
+            if (existingUser) {
+                alert('Login já existe!');
+                return;
+            }
+
+            users.push({ nome, documento, login, senha, status: 'ativo', senhaAtualizada: false });
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            syncUsersWithIndex();
+            
+            addToHistory(`Novo usuário ${nome} (${login}) foi criado`);
+            
+            alert('Usuário criado com sucesso! Agora ele pode fazer login no sistema.');
+            document.getElementById('userForm').reset();
+            loadUsers();
+        });
+
+        // Formulário de editar senha
+        document.getElementById('editPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const newPassword = document.getElementById('editPassword').value;
+            
+            if (!newPassword || newPassword.trim() === '') {
+                alert('Digite uma nova senha!');
+                return;
+            }
+            
+            users[currentEditingUser].senha = newPassword;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            syncUsersWithIndex();
+            
+            addToHistory(`Senha do usuário ${users[currentEditingUser].nome} (${users[currentEditingUser].login}) foi alterada`);
+            
+            alert('Senha atualizada com sucesso!');
+            closeEditModal();
+            loadUsers();
+        });
+
+        // Verificar se está logado
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('adminLogado') === 'true') {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadUsers();
+            }
+        });
+    </script>
+</body>
+</html>
