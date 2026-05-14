@@ -1,0 +1,254 @@
+/* CRONOGRAMA - ESTILOS ESPECÍFICOS */
+.cronograma-section {
+    background: #f8f9fa;
+    border-radius: 20px;
+    padding: 1rem;
+}
+
+.cronograma-fases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.fase-coluna {
+    flex: 1;
+    min-width: 200px;
+    background: white;
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.fase-titulo {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid #667eea;
+    color: #333;
+}
+
+.tarefas-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.tarefas-list::-webkit-scrollbar {
+    width: 6px;
+}
+.tarefas-list::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 30px;
+}
+.tarefas-list::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 8px;
+}
+
+.tarefa-item {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #ffc107;
+    transition: all 0.2s;
+}
+
+.tarefa-item:hover {
+    transform: translateX(3px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.tarefa-item.concluida {
+    border-left-color: #28a745;
+    background: #f0fdf4;
+    opacity: 0.8;
+}
+
+.tarefa-info {
+    flex: 1;
+}
+
+.tarefa-nome {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.tarefa-resp {
+    font-size: 0.75rem;
+    color: #666;
+    display: flex;
+    gap: 12px;
+}
+
+.tarefa-resp span {
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.tarefa-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.tarefa-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.tarefa-actions button:hover {
+    background: #e9ecef;
+    transform: scale(1.05);
+}
+
+.add-task-area {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+}
+
+.add-task-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.add-task-row input, .add-task-row select {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.btn-add-task {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.btn-add-task:hover {
+    background: #218838;
+}
+
+.edit-tarefa-modal,
+.equipe-form {
+    background: #ffffff;
+    border: 1px solid #dde2e6;
+    border-radius: 14px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+.edit-task-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 0.75rem;
+}
+
+.edit-task-row input,
+.edit-task-row select,
+.equipe-form input,
+.equipe-form select {
+    flex: 1;
+    min-width: 140px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.edit-task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.equipe-list {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.equipe-list .equipe-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.85rem;
+    font-size: 0.95rem;
+}
+
+.empty-tasks {
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+    font-style: italic;
+}
+/* Adicione no final da seção de estilos */
+.cronograma-total {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+    border: 1px solid #667eea;
+}
+
+.cronograma-total h4 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.total-summary {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.total-card {
+    background: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.total-card span {
+    font-size: 12px;
+    color: #666;
+}
+
+.total-card .total-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #667eea;
+}

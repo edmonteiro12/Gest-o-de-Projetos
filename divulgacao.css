@@ -1,0 +1,39 @@
+/* PLANO DE DIVULGAÇÃO - ESTILOS ESPECÍFICOS */
+.divulgacao-section {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.divulgacao-section .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.divulgacao-section label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.divulgacao-section textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: all 0.2s;
+    background: white;
+}
+
+.divulgacao-section textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+}
+
+.divulgacao-section textarea::placeholder {
+    color: #aaa;
+    font-style: italic;
+}

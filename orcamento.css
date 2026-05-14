@@ -1,0 +1,92 @@
+/* ORÇAMENTO - ESTILOS ESPECÍFICOS */
+.orcamento-section {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.budget-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.budget-table th, .budget-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    text-align: left;
+}
+
+.budget-table th {
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+}
+
+.budget-table tr:hover {
+    background: #f8f9fa;
+}
+
+.budget-table input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.budget-table input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
+}
+
+.budget-table td:last-child {
+    text-align: center;
+    width: 50px;
+}
+
+.budget-table button {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.budget-table button:hover {
+    background: #c82333;
+}
+
+.btn-add-row {
+    margin-top: 1rem;
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn-add-row:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.grand-total {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: right;
+}
