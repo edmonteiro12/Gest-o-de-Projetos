@@ -469,14 +469,19 @@
 }
 
 .calendar-event.completed {
-    background: #28a745 !important;
-    color: white !important;
+    background-color: #4caf50;
+    color: white;
+    text-decoration: line-through;
 }
 
 .calendar-event.urgent {
-    background: #dc3545 !important;
-    color: white !important;
-    animation: pulse 1s infinite;
+    background-color: #ff4444;
+    color: white;
+}
+
+.calendar-event.near-expiry {
+    background-color: #ffeb3b;
+    color: #333;
 }
 
 @keyframes pulse {
