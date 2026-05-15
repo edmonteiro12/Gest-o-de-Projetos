@@ -10,7 +10,7 @@
         .login-box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 400px; text-align: center; }
         .login-box h2 { color: #333; margin-bottom: 30px; }
         .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .login-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .login-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
         .login-box button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .error-msg { color: red; margin-top: 10px; font-size: 14px; }
 
@@ -19,7 +19,7 @@
         .logo { font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .logout-btn { background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; flex-wrap: wrap; }
         .tab { padding: 10px 20px; cursor: pointer; background: #e9ecef; border-radius: 8px 8px 0 0; }
         .tab.active { background: #667eea; color: white; }
 
@@ -35,11 +35,14 @@
         .status { padding: 5px 10px; border-radius: 20px; font-size: 12px; }
         .ativo { background: #d4edda; color: #155724; }
         .bloqueado { background: #f8d7da; color: #721c24; }
+        .expirado { background: #f8d7da; color: #721c24; }
         .btn-small { padding: 5px 12px; margin: 2px; font-size: 12px; background: #0066cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
         .btn-small:hover { background: #0052a3; }
         .btn-edit { background: #007bff; }
         .btn-block { background: #dc3545; }
         .btn-unlock { background: #28a745; }
+        .btn-delete { background: #e83e8c; }
+        .btn-renew { background: #17a2b8; }
         .modal-edit { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-edit.show { display: flex; }
         .modal-edit-content { background: white; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
@@ -68,10 +71,13 @@
         </div>
         <div style="padding: 20px;">
             <div class="tabs">
-                <div class="tab active" onclick="showTab('cadastro')">Cadastro</div>
+                <div class="tab active" onclick="showTab('cadastro')">Cadastro Usuários</div>
+                <div class="tab" onclick="showTab('usuarios-demo')">Usuários Demo</div>
                 <div class="tab" onclick="showTab('gerenciar')">Gerenciar Usuários</div>
                 <div class="tab" onclick="showTab('historico')">Histórico</div>
             </div>
+
+            <!-- ABA CADASTRO -->
             <div id="cadastro" class="tab-content">
                 <h3>Criar Novo Usuário</h3>
                 <form id="userForm">
@@ -91,9 +97,42 @@
                         <label for="senha">Senha:</label>
                         <input type="password" id="senha" required>
                     </div>
+                    <div class="form-group">
+                        <label for="diasAcesso">Dias de Acesso:</label>
+                        <input type="number" id="diasAcesso" value="30" min="1" required>
+                    </div>
                     <button type="submit">Criar Usuário</button>
                 </form>
             </div>
+
+            <!-- ABA USUÁRIOS DEMO -->
+            <div id="usuarios-demo" class="tab-content" style="display: none;">
+                <h3>Gerenciar Usuários de Demonstração</h3>
+                <form id="demoUserForm">
+                    <div class="form-group">
+                        <label for="demoLogin">Login Demo:</label>
+                        <input type="text" id="demoLogin" placeholder="ex: user1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="demoSenha">Senha Demo:</label>
+                        <input type="password" id="demoSenha" placeholder="ex: senha123" required>
+                    </div>
+                    <button type="submit">Adicionar Usuário Demo</button>
+                </form>
+
+                <h3 style="margin-top: 30px;">Usuários Demo Cadastrados</h3>
+                <table id="demoUsersTable">
+                    <thead>
+                        <tr>
+                            <th>Login</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- ABA GERENCIAR -->
             <div id="gerenciar" class="tab-content" style="display: none;">
                 <h3>Gerenciar Usuários Cadastrados</h3>
                 <table id="gerenciarTable">
@@ -102,12 +141,15 @@
                             <th>Nome</th>
                             <th>Login</th>
                             <th>Status</th>
+                            <th>Expiração</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
+
+            <!-- ABA HISTÓRICO -->
             <div id="historico" class="tab-content" style="display: none;">
                 <h3>Histórico de Atualizações</h3>
                 <div id="historicoContainer" style="max-height: 500px; overflow-y: auto;"></div>
@@ -134,8 +176,28 @@
         </div>
     </div>
 
+    <!-- MODAL RENOVAR ACESSO -->
+    <div id="renewAccessModal" class="modal-edit">
+        <div class="modal-edit-content">
+            <span class="close-modal-edit" onclick="closeRenewModal()">&times;</span>
+            <h3>Renovar Acesso</h3>
+            <form id="renewAccessForm">
+                <div class="form-group">
+                    <label for="renewUserLogin">Login:</label>
+                    <input type="text" id="renewUserLogin" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="renewDays">Adicionar Dias:</label>
+                    <input type="number" id="renewDays" value="30" min="1" required>
+                </div>
+                <button type="submit" style="width: 100%; margin-top: 15px;">Renovar Acesso</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         let currentEditingUser = null;
+        let currentReviewingUser = null;
         const ADMIN_PASSWORD = 'admin123'; // Alterar em produção
 
         // Sincronizar usuários com index
@@ -146,17 +208,28 @@
             
             adminUsers.forEach(adminUser => {
                 if (adminUser.status !== 'bloqueado') {
-                    const existe = cultureUsers.find(u => u.email === adminUser.login);
-                    if (!existe) {
-                        cultureUsers.push({
-                            email: adminUser.login,
-                            password: adminUser.senha,
-                            name: adminUser.nome
-                        });
-                        atualizado = true;
-                    } else if (existe.password !== adminUser.senha) {
-                        existe.password = adminUser.senha;
-                        atualizado = true;
+                    // Verificar se acesso não expirou
+                    let acessoValido = true;
+                    if (adminUser.dataExpiracao) {
+                        const expireDate = new Date(adminUser.dataExpiracao);
+                        if (new Date() > expireDate) {
+                            acessoValido = false;
+                        }
+                    }
+
+                    if (acessoValido) {
+                        const existe = cultureUsers.find(u => u.email === adminUser.login);
+                        if (!existe) {
+                            cultureUsers.push({
+                                email: adminUser.login,
+                                password: adminUser.senha,
+                                name: adminUser.nome
+                            });
+                            atualizado = true;
+                        } else if (existe.password !== adminUser.senha) {
+                            existe.password = adminUser.senha;
+                            atualizado = true;
+                        }
                     }
                 }
             });
@@ -164,6 +237,24 @@
             if (atualizado) {
                 localStorage.setItem('cultureUsers', JSON.stringify(cultureUsers));
                 console.log('Usuários sincronizados com o sistema principal');
+            }
+
+            // Sincronizar usuários demo
+            const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            demoUsers.forEach(demoUser => {
+                const existe = cultureUsers.find(u => u.email === demoUser.login);
+                if (!existe) {
+                    cultureUsers.push({
+                        email: demoUser.login,
+                        password: demoUser.senha,
+                        name: 'Demo User'
+                    });
+                    atualizado = true;
+                }
+            });
+
+            if (atualizado) {
+                localStorage.setItem('cultureUsers', JSON.stringify(cultureUsers));
             }
         }
 
@@ -178,6 +269,7 @@
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 loadUsers();
+                loadDemoUsers();
                 loadHistory();
                 errorDiv.textContent = '';
             } else {
@@ -206,12 +298,14 @@
 
             if (tabName === 'gerenciar') {
                 loadUsers();
+            } else if (tabName === 'usuarios-demo') {
+                loadDemoUsers();
             } else if (tabName === 'historico') {
                 loadHistory();
             }
         }
 
-        // Carregar usuários
+        // Carregar usuários normais
         function loadUsers() {
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             const tbody = document.querySelector('#gerenciarTable tbody');
@@ -219,14 +313,51 @@
 
             users.forEach((user, index) => {
                 const row = document.createElement('tr');
-                const statusClass = user.status === 'ativo' ? 'ativo' : 'bloqueado';
+                let statusClass = user.status === 'ativo' ? 'ativo' : 'bloqueado';
+                let statusText = user.status;
+                let expiracaoText = 'Sem limite';
+                let expiracaoFormatada = '';
+
+                // Verificar expiração
+                if (user.dataExpiracao) {
+                    const expireDate = new Date(user.dataExpiracao);
+                    expiracaoFormatada = expireDate.toLocaleDateString('pt-BR');
+                    if (new Date() > expireDate) {
+                        statusClass = 'expirado';
+                        statusText = 'Expirado';
+                    } else {
+                        expiracaoText = expiracaoFormatada;
+                    }
+                }
+
                 row.innerHTML = `
                     <td>${user.nome}</td>
                     <td>${user.login}</td>
-                    <td><span class="status ${statusClass}">${user.status}</span></td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>${expiracaoText}</td>
                     <td>
                         <button class="btn-small btn-edit" onclick="editPassword(${index})">Editar Senha</button>
                         <button class="btn-small btn-block" onclick="toggleStatus(${index})">${user.status === 'bloqueado' ? 'Desbloquear' : 'Bloquear'}</button>
+                        <button class="btn-small btn-renew" onclick="openRenewModal(${index})">Renovar</button>
+                        <button class="btn-small btn-delete" onclick="deleteUser(${index})">Deletar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Carregar usuários demo
+        function loadDemoUsers() {
+            const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            const tbody = document.querySelector('#demoUsersTable tbody');
+            tbody.innerHTML = '';
+
+            demoUsers.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.login}</td>
+                    <td>
+                        <button class="btn-small btn-delete" onclick="deleteDemoUser(${index})">Deletar</button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -242,10 +373,25 @@
             document.getElementById('editPasswordModal').classList.add('show');
         }
 
-        // Fechar modal
+        // Fechar modal de edição
         function closeEditModal() {
             document.getElementById('editPasswordModal').classList.remove('show');
             currentEditingUser = null;
+        }
+
+        // Abrir modal renovar acesso
+        function openRenewModal(index) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            currentReviewingUser = index;
+            document.getElementById('renewUserLogin').value = users[index].login;
+            document.getElementById('renewDays').value = '30';
+            document.getElementById('renewAccessModal').classList.add('show');
+        }
+
+        // Fechar modal renovar
+        function closeRenewModal() {
+            document.getElementById('renewAccessModal').classList.remove('show');
+            currentReviewingUser = null;
         }
 
         // Alternar status
@@ -260,6 +406,34 @@
             addToHistory(`${users[index].nome} (${users[index].login}) foi ${action}`);
             
             loadUsers();
+        }
+
+        // Deletar usuário
+        function deleteUser(index) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userName = users[index].login;
+            
+            if (confirm(`Tem certeza que deseja deletar o usuário "${userName}"?`)) {
+                users.splice(index, 1);
+                localStorage.setItem('users', JSON.stringify(users));
+                syncUsersWithIndex();
+                addToHistory(`Usuário ${userName} foi deletado`);
+                loadUsers();
+            }
+        }
+
+        // Deletar usuário demo
+        function deleteDemoUser(index) {
+            const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            const userName = demoUsers[index].login;
+            
+            if (confirm(`Tem certeza que deseja deletar o usuário demo "${userName}"?`)) {
+                demoUsers.splice(index, 1);
+                localStorage.setItem('demoUsers', JSON.stringify(demoUsers));
+                syncUsersWithIndex();
+                addToHistory(`Usuário demo ${userName} foi deletado`);
+                loadDemoUsers();
+            }
         }
 
         // Adicionar ao histórico
@@ -292,13 +466,14 @@
             });
         }
 
-        // Formulário de criar usuário
+        // Formulário criar usuário normal
         document.getElementById('userForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const nome = document.getElementById('nome').value;
             const documento = document.getElementById('documento').value;
             const login = document.getElementById('login').value;
             const senha = document.getElementById('senha').value;
+            const diasAcesso = parseInt(document.getElementById('diasAcesso').value);
 
             let users = JSON.parse(localStorage.getItem('users') || '[]');
             const existingUser = users.find(u => u.login === login);
@@ -307,19 +482,56 @@
                 return;
             }
 
-            users.push({ nome, documento, login, senha, status: 'ativo', senhaAtualizada: false });
+            // Calcular data de expiração
+            const dataExpiracao = new Date();
+            dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
+
+            users.push({ 
+                nome, 
+                documento, 
+                login, 
+                senha, 
+                status: 'ativo', 
+                senhaAtualizada: false,
+                dataExpiracao: dataExpiracao.toISOString()
+            });
             localStorage.setItem('users', JSON.stringify(users));
             
             syncUsersWithIndex();
             
-            addToHistory(`Novo usuário ${nome} (${login}) foi criado`);
+            addToHistory(`Novo usuário ${nome} (${login}) foi criado com acesso até ${dataExpiracao.toLocaleDateString('pt-BR')}`);
             
-            alert('Usuário criado com sucesso! Agora ele pode fazer login no sistema.');
+            alert('Usuário criado com sucesso!');
             document.getElementById('userForm').reset();
             loadUsers();
         });
 
-        // Formulário de editar senha
+        // Formulário criar usuário demo
+        document.getElementById('demoUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const demoLogin = document.getElementById('demoLogin').value;
+            const demoSenha = document.getElementById('demoSenha').value;
+
+            let demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            const existingDemoUser = demoUsers.find(u => u.login === demoLogin);
+            if (existingDemoUser) {
+                alert('Login demo já existe!');
+                return;
+            }
+
+            demoUsers.push({ login: demoLogin, senha: demoSenha });
+            localStorage.setItem('demoUsers', JSON.stringify(demoUsers));
+            
+            syncUsersWithIndex();
+            
+            addToHistory(`Novo usuário demo ${demoLogin} foi adicionado`);
+            
+            alert('Usuário demo adicionado com sucesso!');
+            document.getElementById('demoUserForm').reset();
+            loadDemoUsers();
+        });
+
+        // Formulário editar senha
         document.getElementById('editPasswordForm').addEventListener('submit', function(e) {
             e.preventDefault();
             let users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -342,12 +554,43 @@
             loadUsers();
         });
 
+        // Formulário renovar acesso
+        document.getElementById('renewAccessForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const renewDays = parseInt(document.getElementById('renewDays').value);
+            
+            if (!renewDays || renewDays < 1) {
+                alert('Digite uma quantidade válida de dias!');
+                return;
+            }
+            
+            let dataExpiracao = new Date();
+            if (users[currentReviewingUser].dataExpiracao) {
+                dataExpiracao = new Date(users[currentReviewingUser].dataExpiracao);
+            }
+            dataExpiracao.setDate(dataExpiracao.getDate() + renewDays);
+            
+            users[currentReviewingUser].dataExpiracao = dataExpiracao.toISOString();
+            users[currentReviewingUser].status = 'ativo'; // Reativar se expirado
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            syncUsersWithIndex();
+            
+            addToHistory(`Acesso do usuário ${users[currentReviewingUser].nome} (${users[currentReviewingUser].login}) foi renovado até ${dataExpiracao.toLocaleDateString('pt-BR')}`);
+            
+            alert('Acesso renovado com sucesso até ' + dataExpiracao.toLocaleDateString('pt-BR'));
+            closeRenewModal();
+            loadUsers();
+        });
+
         // Verificar se está logado
         window.addEventListener('load', function() {
             if (sessionStorage.getItem('adminLogado') === 'true') {
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 loadUsers();
+                loadDemoUsers();
             }
         });
     </script>
