@@ -195,11 +195,6 @@
         </div>
 
         <div class="login-body">
-            <!-- TABS -->
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchLoginTab('login')">🔓 Login</button>
-            </div>
-
             <!-- ABA LOGIN -->
             <div id="loginTab" class="tab-content active">
                 <div class="warning-info">
@@ -231,89 +226,52 @@
 
     <script src="auth.js"></script>
     <script>
-        function switchLoginTab(tabName) {
-            document.getElementById('loginTab').classList.remove('active');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-
-            document.getElementById('loginTab').classList.add('active');
-            document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        }
-
+        /**
+         * Fazer login usando o AuthSystem
+         */
         function handleLogin() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
             const messageDiv = document.getElementById('loginMessage');
 
+            // Validação básica
             if (!username || !password) {
                 showMessage(messageDiv, 'Por favor, preencha todos os campos', 'error');
                 return;
             }
 
-            // Verificar usuários normais cadastrados no admin.html
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            const user = users.find(u => u.login === username && u.senha === password);
+            // Usar o método login do AuthSystem que já trata tudo
+            const result = auth.login(username, password);
 
-            if (user) {
-                // Verificar se acesso expirou
-                if (user.dataExpiracao) {
-                    const expireDate = new Date(user.dataExpiracao);
-                    if (new Date() > expireDate) {
-                        showMessage(messageDiv, '❌ Seu acesso expirou em ' + expireDate.toLocaleDateString('pt-BR') + '. Entre em contato com o administrador.', 'error');
-                        return;
-                    }
-                }
-
-                // Verificar se está bloqueado
-                if (user.status === 'bloqueado') {
-                    showMessage(messageDiv, '❌ Sua conta foi bloqueada. Entre em contato com o administrador.', 'error');
-                    return;
-                }
-
-                // Login bem-sucedido
-                const result = auth.login(username, password);
-                if (result.success) {
-                    showMessage(messageDiv, '✅ ' + result.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                } else {
-                    showMessage(messageDiv, '❌ ' + result.message, 'error');
-                }
-                return;
+            if (result.success) {
+                showMessage(messageDiv, '✅ ' + result.message, 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                showMessage(messageDiv, '❌ ' + result.message, 'error');
             }
-
-            // Verificar usuários demo (se existirem)
-            const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
-            const demoUser = demoUsers.find(u => u.login === username && u.senha === password);
-
-            if (demoUser) {
-                // Usuários demo sempre têm acesso (para testes)
-                const result = auth.login(username, password);
-                if (result.success) {
-                    showMessage(messageDiv, '✅ ' + result.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                } else {
-                    showMessage(messageDiv, '❌ ' + result.message, 'error');
-                }
-                return;
-            }
-
-            showMessage(messageDiv, '❌ Usuário ou senha incorretos', 'error');
         }
 
+        /**
+         * Exibir mensagem de feedback
+         */
         function showMessage(element, message, type) {
             element.textContent = message;
             element.className = 'message ' + type;
             element.style.display = 'block';
         }
 
+        /**
+         * Inicializar página de login
+         */
         document.addEventListener('DOMContentLoaded', () => {
+            // Permitir login ao pressionar Enter
             document.getElementById('loginPassword').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') handleLogin();
             });
 
+            // Redirecionar se já está logado
             if (auth.isLoggedIn()) {
                 window.location.href = 'index.html';
             }
