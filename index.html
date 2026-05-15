@@ -583,6 +583,12 @@
     </style>
 </head>
 <body>
+    <script src="login.js"></script>
+    <script>
+        // Proteger a página - redirecionar se não está autenticado
+        protectIndexPage();
+    </script>
+
     <div id="appContainer" class="app-container">
         <div class="header">
             <div class="logo">🎭 Gestão de Projetos</div>
@@ -830,6 +836,15 @@
         </div>
     </div>
 
+    <script>
+        // Mostrar nome do usuário logado
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = loginManager.getCurrentUser();
+            if (username) {
+                document.getElementById('userNameDisplay').textContent = '👤 ' + username;
+            }
+        });
+    </script>
     <script src="auth.js"></script>
     <script src="app.js"></script>
 </body>
