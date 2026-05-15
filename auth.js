@@ -3,8 +3,75 @@
 class AuthSystem {
     constructor() {
         this.usersKey = 'cultureUsers';
+        this.adminUsersKey = 'users'; // Usuários cadastrados no admin
         this.currentUserKey = 'currentUser';
         this.initializeUsers();
+    }
+
+    // Sincronizar usuários do admin com o sistema de autenticação
+    syncAdminUsers() {
+        const adminUsers = JSON.parse(localStorage.getItem(this.adminUsersKey) || '[]');
+        let cultureUsers = JSON.parse(localStorage.getItem(this.usersKey) || '{}');
+        
+        // Converter para objeto se for array (compatibilidade)
+        if (Array.isArray(cultureUsers)) {
+            cultureUsers = {};
+        }
+
+        let sincronizado = false;
+
+        adminUsers.forEach(adminUser => {
+            // Verificar se usuário não está bloqueado e acesso não expirou
+            if (adminUser.status !== 'bloqueado') {
+                let acessoValido = true;
+                
+                if (adminUser.dataExpiracao) {
+                    const expireDate = new Date(adminUser.dataExpiracao);
+                    if (new Date() > expireDate) {
+                        acessoValido = false;
+                    }
+                }
+
+                if (acessoValido) {
+                    const login = adminUser.login;
+                    
+                    // Adicionar ou atualizar no formato cultureUsers
+                    if (!cultureUsers[login] || cultureUsers[login].password !== adminUser.senha) {
+                        cultureUsers[login] = {
+                            username: login,
+                            password: adminUser.senha,
+                            email: login + '@sistema.local',
+                            nome: adminUser.nome,
+                            createdAt: new Date().toISOString()
+                        };
+                        sincronizado = true;
+                    }
+                }
+            }
+        });
+
+        // Sincronizar usuários demo também
+        const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+        demoUsers.forEach(demoUser => {
+            const login = demoUser.login;
+            if (!cultureUsers[login] || cultureUsers[login].password !== demoUser.senha) {
+                cultureUsers[login] = {
+                    username: login,
+                    password: demoUser.senha,
+                    email: login + '@demo.local',
+                    nome: 'Demo User',
+                    createdAt: new Date().toISOString()
+                };
+                sincronizado = true;
+            }
+        });
+
+        if (sincronizado) {
+            localStorage.setItem(this.usersKey, JSON.stringify(cultureUsers));
+            console.log('✅ Usuários sincronizados do admin');
+        }
+
+        return cultureUsers;
     }
 
     // Inicializar usuários padrão
@@ -33,10 +100,16 @@ class AuthSystem {
             };
             localStorage.setItem(this.usersKey, JSON.stringify(defaultUsers));
         }
+
+        // Sincronizar usuários do admin na inicialização
+        this.syncAdminUsers();
     }
 
     // Fazer login
     login(username, password) {
+        // Primeiro sincronizar usuários do admin
+        this.syncAdminUsers();
+
         const users = JSON.parse(localStorage.getItem(this.usersKey) || '{}');
         const user = users[username];
 
