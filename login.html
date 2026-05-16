@@ -51,40 +51,6 @@
             padding: 40px;
         }
 
-<<<<<<< HEAD
-=======
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .tab-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
         .form-group {
             margin-bottom: 20px;
         }
@@ -110,18 +76,6 @@
             outline: none;
             border-color: #667eea;
         }
-
-<<<<<<< HEAD
-=======
-        .form-group input::placeholder {
-            color: #999;
-        }
-
-        .button-group {
-            margin-top: 30px;
-        }
-
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
         .btn {
             width: 100%;
             padding: 12px;
@@ -131,13 +85,13 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
-<<<<<<< HEAD
+
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
         .btn:hover {
-=======
+
         }
 
         .btn-submit {
@@ -146,10 +100,6 @@
             margin-bottom: 10px;
         }
 
-        .btn-submit:hover {
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
-            transform: translateY(-2px);
-        }
 
         .message {
             padding: 12px;
@@ -162,21 +112,12 @@
         .message.success {
             background: #d4edda;
             color: #155724;
-<<<<<<< HEAD
-=======
-            border: 1px solid #c3e6cb;
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
-            display: block;
-        }
+
 
         .message.error {
             background: #f8d7da;
             color: #721c24;
-<<<<<<< HEAD
-            display: block;
-        }
 
-=======
             border: 1px solid #f5c6cb;
             display: block;
         }
@@ -188,7 +129,7 @@
             margin-top: 20px;
         }
 
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
+
         .warning-info {
             background: #fff3cd;
             border-left: 4px solid #ffc107;
@@ -203,13 +144,12 @@
             .login-body {
                 padding: 25px;
             }
-<<<<<<< HEAD
-=======
+
 
             .login-header h1 {
                 font-size: 24px;
             }
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
+
         }
     </style>
 </head>
@@ -221,7 +161,7 @@
         </div>
 
         <div class="login-body">
-<<<<<<< HEAD
+
             <div class="warning-info">
                 ⚠️ <strong>Importante:</strong> Seu acesso é gerenciado pelo administrador. Entre em contato para obter suas credenciais.
             </div>
@@ -239,65 +179,29 @@
             </div>
 
             <button class="btn" onclick="handleLogin()">Entrar</button>
-=======
-            <!-- ABA LOGIN -->
-            <div id="loginTab" class="tab-content active">
-                <div class="warning-info">
-                    ⚠️ <strong>Importante:</strong> Se seu acesso expirou, entre em contato com o administrador para renovar seu acesso.
-                </div>
 
-                <div id="loginMessage" class="message"></div>
-
-                <div class="form-group">
-                    <label>Usuário</label>
-                    <input type="text" id="loginUsername" placeholder="Digite seu usuário" autocomplete="username">
-                </div>
-
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="loginPassword" placeholder="Digite sua senha" autocomplete="current-password">
-                </div>
-
-                <div class="button-group">
-                    <button class="btn btn-submit" onclick="handleLogin()">Entrar</button>
-                </div>
-
-                <div class="footer-text">
-                    💡 Para acessar o sistema, entre em contato com o administrador
-                </div>
-            </div>
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
         </div>
     </div>
-
     <script src="auth.js"></script>
     <script>
-<<<<<<< HEAD
+
         let redirecting = false;
 
         function handleLogin() {
             if (redirecting) return;
-            
-=======
-        /**
-         * Fazer login usando o AuthSystem
-         */
+
         function handleLogin() {
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
             const messageDiv = document.getElementById('loginMessage');
 
-<<<<<<< HEAD
-=======
+
             // Validação básica
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
             if (!username || !password) {
                 showMessage(messageDiv, 'Por favor, preencha todos os campos', 'error');
                 return;
             }
 
-<<<<<<< HEAD
             const result = auth.login(username, password);
 
             if (result.success) {
@@ -305,7 +209,6 @@
                 showMessage(messageDiv, '✅ ' + result.message, 'success');
                 setTimeout(() => {
                     window.location.replace('index.html');
-=======
             // Usar o método login do AuthSystem que já trata tudo
             const result = auth.login(username, password);
 
@@ -313,24 +216,18 @@
                 showMessage(messageDiv, '✅ ' + result.message, 'success');
                 setTimeout(() => {
                     window.location.href = 'index.html';
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
                 }, 1000);
             } else {
                 showMessage(messageDiv, '❌ ' + result.message, 'error');
             }
         }
 
-<<<<<<< HEAD
-=======
-        /**
-         * Exibir mensagem de feedback
-         */
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
+
         function showMessage(element, message, type) {
             element.textContent = message;
             element.className = 'message ' + type;
             element.style.display = 'block';
-<<<<<<< HEAD
+
             setTimeout(() => {
                 element.style.display = 'none';
             }, 3000);
@@ -348,15 +245,8 @@
             sessionStorage.removeItem('currentUser');
             localStorage.removeItem('current_user');
         });
-    </script>
-</body>
-</html>
-=======
-        }
-
-        /**
-         * Inicializar página de login
-         */
+  
+        
         document.addEventListener('DOMContentLoaded', () => {
             // Permitir login ao pressionar Enter
             document.getElementById('loginPassword').addEventListener('keypress', (e) => {
@@ -371,4 +261,3 @@
     </script>
 </body>
 </html>
->>>>>>> 77a6df3d31197b0e6323d4bd2ee57d40be8567e1
