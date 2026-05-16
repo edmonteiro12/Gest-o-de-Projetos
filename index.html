@@ -215,30 +215,101 @@
     </div>
 
     <!-- Aba ORÇAMENTO -->
-    <div id="tabBudget" class="tab-content">
-        <div class="form-section">
-            <h3>Planilha Orçamentária</h3>
-            <div id="budgetContainer"></div>
-            <div style="margin-top:20px; border-top:2px solid #667eea; padding-top:20px;">
-                <h4 style="color:#667eea;">➕ Adicionar Item</h4>
-                <div class="add-budget-row">
-                    <input type="text" id="numeroItem" readonly style="background:#f0f0f0;">
-                    <input type="text" id="descricaoItem" placeholder="Descrição">
-                    <select id="categoriaItem"><option value="1. Profissionais da área">1. Profissionais</option><option value="2. Prestadores de serviços">2. Prestadores</option><option value="3. Equipamentos">3. Equipamentos</option><option value="4. Logística">4. Logística</option><option value="5. Divulgação">5. Divulgação</option><option value="6. Acessibilidade">6. Acessibilidade</option><option value="7. Custo Adm">7. Custo Adm</option><option value="8. Taxas">8. Taxas</option></select>
-                    <input type="number" id="quantidadeItem" placeholder="Qtd" value="1" min="1">
-                    <select id="unidadeItem"><option value="Dia">Dia</option><option value="Mês">Mês</option><option value="Unidade">Unidade</option><option value="Hora">Hora</option></select>
-                    <input type="number" id="qtdUnidade" value="1" min="1">
-                    <input type="number" id="valorUnitario" placeholder="Valor unitário" step="0.01">
-                    <input type="number" id="valorTotalItem" readonly style="background:#f0f0f0;">
-                    <button type="button" onclick="addBudgetItem()" class="btn-add-task">+</button>
+<div id="tabBudget" class="tab-content">
+    <div class="form-section">
+        <h3>💰 Planilha Orçamentária</h3>
+        <div id="budgetContainer"></div>
+        
+        <div style="margin-top:25px; border-top:2px solid #667eea; padding-top:20px;">
+            <h4 style="color:#667eea; margin-bottom:15px;">➕ Adicionar Item ao Orçamento</h4>
+            
+            <div style="background:#f8f9fa; padding:20px; border-radius:12px;">
+                <!-- Linha 1: Categoria e Descrição -->
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #555;">📁 Categoria:</label>
+                        <select id="categoriaItem" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                            <option value="1. Profissionais da área">1. Profissionais da área</option>
+                            <option value="2. Prestadores de serviços">2. Prestadores de serviços</option>
+                            <option value="3. Equipamentos, materiais, estruturas">3. Equipamentos, materiais, estruturas</option>
+                            <option value="4. Logística">4. Logística</option>
+                            <option value="5. Divulgação, mídia e comunicação">5. Divulgação, mídia e comunicação</option>
+                            <option value="6. Ações de acessibilidade">6. Ações de acessibilidade</option>
+                            <option value="7. Custo Administrativo">7. Custo Administrativo</option>
+                            <option value="8. Taxas e serviços">8. Taxas e serviços</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #555;">📝 Descrição do Item:</label>
+                        <input type="text" id="descricaoItem" placeholder="Ex: Consultoria jurídica, Material de escritório..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                    </div>
+                </div>
+                
+                <!-- Linha 2: Quantidade, Unidade, Qtd de Unidade -->
+                <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #555;">🔢 Quantidade:</label>
+                        <input type="number" id="quantidadeItem" placeholder="Ex: 3" value="1" min="1" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                        <small style="color:#999;">Número de itens (ex: 3 consultorias)</small>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #555;">📏 Unidade de Medida:</label>
+                        <select id="unidadeItem" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                            <option value="Dia">Dia</option>
+                            <option value="Mês">Mês</option>
+                            <option value="Semana">Semana</option>
+                            <option value="Cachê">Cachê</option>
+                            <option value="Projeto">Projeto</option>
+                            <option value="Item">Item</option>
+                            <option value="Pacote">Pacote</option>
+                            <option value="Metro">Metro</option>
+                            <option value="Metro quadrado">Metro quadrado</option>
+                            <option value="Unidade">Unidade</option>
+                            <option value="Kit">Kit</option>
+                            <option value="Peça">Peça</option>
+                            <option value="Hora">Hora</option>
+                            <option value="Diária">Diária</option>
+                            <option value="Quilograma">Quilograma</option>
+                            <option value="Litro">Litro</option>
+                        </select>
+                        <small style="color:#999;">Unidade de medida do item</small>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #555;">🔢 Quantidade de Unidade:</label>
+                        <input type="number" id="qtdUnidade" placeholder="Ex: 2" value="1" min="1" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                        <small style="color:#999;">Ex: 2 dias, 3 meses, 4 horas</small>
+                    </div>
+                </div>
+                
+                <!-- Linha 3: Valor Unitário e Valor Total -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #555;">💰 Valor Unitário (R$):</label>
+                        <input type="number" id="valorUnitario" placeholder="0,00" step="0.01" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;" oninput="calcularValorTotal()">
+                        <small style="color:#999;">Valor por unidade</small>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #555;">💵 Valor Total (R$):</label>
+                        <input type="text" id="valorTotalItem" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; background:#f0f0f0;">
+                        <small style="color:#999;">Calculado automaticamente</small>
+                    </div>
+                </div>
+                
+                <!-- Número do Item (oculto) -->
+                <input type="hidden" id="numeroItem" readonly>
+                
+                <!-- Botão Adicionar -->
+                <div style="text-align: right;">
+                    <button type="button" onclick="addBudgetItem()" style="background: #28a745; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold;">➕ Adicionar Item</button>
                 </div>
             </div>
         </div>
-        <div class="tab-footer" style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 10px;">
-            <button type="button" class="btn-cancel" onclick="closeProjectModal()">Cancelar</button>
-            <button type="button" class="btn-save-main" onclick="saveCurrentProjectAndStay()">💾 Salvar Orçamento</button>
-        </div>
     </div>
+    <div class="tab-footer" style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-cancel" onclick="closeProjectModal()">Cancelar</button>
+        <button type="button" class="btn-save-main" onclick="saveCurrentProjectAndStay()">💾 Salvar Orçamento</button>
+    </div>
+</div>
 
     <!-- Aba PLANO DE DIVULGAÇÃO -->
     <div id="tabComunicacao" class="tab-content">
@@ -252,12 +323,7 @@
                 <div id="itemsContainer"></div>
                 <button type="button" class="btn-add" onclick="adicionarLinhaDivulgacao()">➕ Adicionar Peça</button>
             </div>
-            <div style="margin-top:30px;">
-                <h4 style="color:#667eea;">📎 Anexos</h4>
-                <div id="anexosContainer"></div>
-                <button type="button" class="btn-add" onclick="adicionarLinhaAnexo()">📎 Adicionar Anexo</button>
-            </div>
-        </div>
+          </div>
         <div class="tab-footer" style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 10px;">
             <button type="button" class="btn-cancel" onclick="closeProjectModal()">Cancelar</button>
             <button type="button" class="btn-save-main" onclick="saveCurrentProjectAndStay()">💾 Salvar Divulgação</button>
@@ -594,12 +660,36 @@ function nextMonth() {
         </div>`;
     }
     if (categoria === 'musica') {
-        html += `<div class="form-section"><h3>🎵 Especificações Musicais</h3>
-            <div class="form-group"><label>Tipo:</label><select id="projTipoMusica" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="show">Show ao vivo</option><option value="festival">Festival</option><option value="grabacao">Gravação</option><option value="turnê">Turnê</option></select></div>
-            <div class="form-group"><label>Nº Músicas:</label><input type="number" id="projNumMusicas" style="width:100%; padding:10px;"></div>
-            <div class="form-group"><label>Duração (min):</label><input type="number" id="projDuracaoShow" style="width:100%; padding:10px;"></div>
-        </div>`;
-    }
+    html += `<div class="form-section">
+        <h3>🎵 Especificações Musicais</h3>
+        <div class="form-group">
+            <label>Tipo:</label>
+            <select id="projTipoMusica" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                <option value="">Selecione...</option>
+                <option value="show">Show ao vivo</option>
+                <option value="festival">Festival</option>
+                <option value="grabacao">Gravação</option>
+                <option value="turnê">Turnê</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Nº Músicas:</label>
+            <input type="number" id="projNumMusicas" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+        </div>
+        <div class="form-group">
+            <label>Duração (min):</label>
+            <input type="number" id="projDuracaoShow" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+        </div>
+    </div>
+    
+    <!-- LISTA DE MÚSICAS -->
+    <div class="form-section">
+        <h3>🎼 Lista de Músicas / Repertório</h3>
+        <div id="musicasContainer"></div>
+        <button type="button" class="btn-add" onclick="adicionarMusica()" style="margin-top:10px;">➕ Adicionar Música</button>
+    </div>`;
+}
+
     if (categoria === 'circo') {
         html += `<div class="form-section"><h3>🎪 Especificações Circenses</h3>
             <div class="form-group"><label>Modalidade:</label><select id="projModalidadeCirco" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="palhaco">Palhaçaria</option><option value="acrobata">Acrobacia</option><option value="malabarista">Malabarismo</option><option value="magico">Mágica</option><option value="trapezio">Trapézio</option></select></div>
@@ -655,7 +745,110 @@ function nextMonth() {
     }
     return specs;
 }
+// ========== FUNÇÕES PARA MÚSICAS ==========
+function adicionarMusica(titulo = "", interprete = "", compositor = "", arranjo = "", arquivo = "") {
+    const container = document.getElementById('musicasContainer');
+    if (!container) return;
+    const id = `musica_${Date.now()}`;
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    div.id = id;
+    div.style.cssText = 'display: grid; grid-template-columns: 1.5fr 1.2fr 1.2fr 1.2fr 1.5fr 40px; gap: 15px; margin-bottom: 15px; align-items: center; background: #f8f9fa; padding: 12px; border-radius: 8px;';
+    
+    div.innerHTML = `
+        <div>
+            <label style="font-size:12px; color:#666; display: block; margin-bottom: 5px;">🎵 Título da Música</label>
+            <input type="text" class="musica-titulo" value="${escapeHtml(titulo)}" placeholder="Ex: Imagine" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <div>
+            <label style="font-size:12px; color:#666; display: block; margin-bottom: 5px;">🎤 Intérprete</label>
+            <input type="text" class="musica-interprete" value="${escapeHtml(interprete)}" placeholder="Ex: John Lennon" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <div>
+            <label style="font-size:12px; color:#666; display: block; margin-bottom: 5px;">✍️ Composição</label>
+            <input type="text" class="musica-compositor" value="${escapeHtml(compositor)}" placeholder="Ex: John Lennon" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <div>
+            <label style="font-size:12px; color:#666; display: block; margin-bottom: 5px;">🎼 Arranjo</label>
+            <input type="text" class="musica-arranjo" value="${escapeHtml(arranjo)}" placeholder="Ex: Orquestral" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <div>
+            <label style="font-size:12px; color:#666; display: block; margin-bottom: 5px;">📁 Arquivo de Áudio</label>
+            <input type="file" class="musica-arquivo" accept="audio/*" style="display: none;">
+            <button type="button" class="btn-add-comprovante" onclick="abrirSelecionarAudio('${id}')" style="background:#17a2b8; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer; width:100%;">📁 Selecionar Áudio</button>
+            <div class="audio-preview" style="margin-top: 8px; display: none;">
+                <audio controls style="width:100%; height:35px;"></audio>
+            </div>
+            <input type="hidden" class="musica-audio-base64" value="${escapeHtml(arquivo)}">
+        </div>
+        <div>
+            <button type="button" class="btn-remove" onclick="this.closest('.item-row').remove()" style="background:#dc3545; color:white; border:none; padding:8px 10px; border-radius:5px; cursor:pointer; margin-top:24px;">🗑️</button>
+        </div>
+    `;
+    container.appendChild(div);
+    
+    // Se já tiver um arquivo salvo, mostrar preview
+    if (arquivo && arquivo.startsWith('data:audio')) {
+        const previewDiv = div.querySelector('.audio-preview');
+        const audio = previewDiv.querySelector('audio');
+        audio.src = arquivo;
+        previewDiv.style.display = 'block';
+        div.querySelector('.musica-audio-base64').value = arquivo;
+    }
+}
 
+function abrirSelecionarAudio(rowId) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    const fileInput = row.querySelector('.musica-arquivo');
+    if (fileInput) {
+        fileInput.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('audio/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64 = event.target.result;
+                    // Salvar no campo hidden
+                    const hiddenInput = row.querySelector('.musica-audio-base64');
+                    if (hiddenInput) hiddenInput.value = base64;
+                    
+                    // Mostrar preview do áudio
+                    const previewDiv = row.querySelector('.audio-preview');
+                    const audio = previewDiv.querySelector('audio');
+                    audio.src = base64;
+                    previewDiv.style.display = 'block';
+                    
+                    showNotification('✅ Arquivo de áudio anexado!', 'success');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Por favor, selecione um arquivo de áudio válido (MP3, WAV, OGG, etc.)');
+            }
+        };
+        fileInput.click();
+    }
+}
+
+function getMusicas() {
+    const dados = [];
+    document.querySelectorAll('#musicasContainer .item-row').forEach((row, i) => {
+        const titulo = row.querySelector('.musica-titulo')?.value || '';
+        const interprete = row.querySelector('.musica-interprete')?.value || '';
+        const compositor = row.querySelector('.musica-compositor')?.value || '';
+        const arranjo = row.querySelector('.musica-arranjo')?.value || '';
+        const arquivo = row.querySelector('.musica-audio-base64')?.value || '';
+        if (titulo) dados.push({ id: i+1, titulo, interprete, compositor, arranjo, arquivo });
+    });
+    return dados;
+}
+
+function loadMusicas(dados) {
+    const container = document.getElementById('musicasContainer');
+    if (container) container.innerHTML = '';
+    if (dados && dados.length) {
+        dados.forEach(m => adicionarMusica(m.titulo, m.interprete, m.arquivo, m.compositor, m.arranjo));
+    }
+}
 function loadSpecificationsData(project) {
     if (!project?.especificacoes) return;
     const s = project.especificacoes;
@@ -862,46 +1055,138 @@ function loadSpecificationsData(project) {
             if (numField) numField.value = `${principal}.${count}`;
         }
         
-        function addBudgetItem() {
-            const numero = document.getElementById('numeroItem')?.value;
-            const descricao = document.getElementById('descricaoItem')?.value.trim();
-            const categoria = document.getElementById('categoriaItem')?.value;
-            const quantidade = parseFloat(document.getElementById('quantidadeItem')?.value) || 0;
-            const unidade = document.getElementById('unidadeItem')?.value;
-            const qtdUnidade = parseFloat(document.getElementById('qtdUnidade')?.value) || 0;
-            const valorUnitario = parseFloat(document.getElementById('valorUnitario')?.value) || 0;
-            const valorTotal = quantidade * qtdUnidade * valorUnitario;
-            if (!descricao) { alert('Informe a descrição'); return; }
-            budgetItems.push({ numero, descricao, categoria, quantidade, unidade, qtdUnidade, valorUnitario, valorTotal });
-            document.getElementById('descricaoItem').value = ''; document.getElementById('quantidadeItem').value = '1'; document.getElementById('qtdUnidade').value = '1'; document.getElementById('valorUnitario').value = ''; document.getElementById('valorTotalItem').value = '';
-            renderBudget(); atualizarNumeroItem();
-        }
+       function addBudgetItem() {
+    const numero = document.getElementById('numeroItem')?.value || '';
+    const descricao = document.getElementById('descricaoItem')?.value.trim();
+    const categoria = document.getElementById('categoriaItem')?.value;
+    const quantidade = parseFloat(document.getElementById('quantidadeItem')?.value) || 0;
+    const unidade = document.getElementById('unidadeItem')?.value;
+    const qtdUnidade = parseFloat(document.getElementById('qtdUnidade')?.value) || 0;
+    const valorUnitario = parseFloat(document.getElementById('valorUnitario')?.value) || 0;
+    const valorTotal = quantidade * qtdUnidade * valorUnitario;
+    
+    if (!descricao) { 
+        alert('❌ Informe a descrição do item'); 
+        return; 
+    }
+    if (quantidade <= 0) { 
+        alert('❌ Informe uma quantidade válida'); 
+        return; 
+    }
+    if (qtdUnidade <= 0) { 
+        alert('❌ Informe a quantidade de unidade válida'); 
+        return; 
+    }
+    if (valorUnitario <= 0) { 
+        alert('❌ Informe um valor unitário válido'); 
+        return; 
+    }
+    
+    budgetItems.push({ 
+        numero, 
+        descricao, 
+        categoria, 
+        quantidade, 
+        unidade, 
+        qtdUnidade, 
+        valorUnitario, 
+        valorTotal 
+    });
+    
+    // Limpar formulário
+    document.getElementById('descricaoItem').value = '';
+    document.getElementById('quantidadeItem').value = '1';
+    document.getElementById('qtdUnidade').value = '1';
+    document.getElementById('valorUnitario').value = '';
+    document.getElementById('valorTotalItem').value = '';
+    
+    renderBudget(); 
+    atualizarNumeroItem();
+    showNotification('✅ Item adicionado ao orçamento!', 'success');
+}
         
         function removeBudgetItem(idx) { budgetItems.splice(idx,1); renderBudget(); }
         
-        function renderBudget() {
-            const container = document.getElementById('budgetContainer');
-            if (!container) return;
-            const cats = ["1. Profissionais da área","2. Prestadores de serviços","3. Equipamentos","4. Logística","5. Divulgação","6. Acessibilidade","7. Custo Adm","8. Taxas"];
-            let totalGeral = 0, html = '';
-            cats.forEach(cat => {
-                const itens = budgetItems.filter(i => i.categoria === cat);
-                if (itens.length > 0) {
-                    let subtotal = 0;
-                    html += `<div class="budget-category"><h4>${cat}</h4><table class="budget-table"><thead><tr><th>Item</th><th>Qtd</th><th>Valor Unit.</th><th>Total</th><th></th></tr></thead><tbody>`;
-                    itens.forEach((item, idx) => {
-                        const gIdx = budgetItems.findIndex(i => i === item);
-                        subtotal += item.valorTotal;
-                        html += `<tr><td>${escapeHtml(item.descricao)}</td><td>${item.quantidade} x ${item.qtdUnidade} ${item.unidade}</td><td>R$ ${formatarMoedaBrasileira(item.valorUnitario)}</td><td>R$ ${formatarMoedaBrasileira(item.valorTotal)}</td><td><button class="remove-tarefa" onclick="removeBudgetItem(${gIdx})">🗑️</button></td></tr>`;
-                    });
-                    html += `<tr style="background:#f0f0f0;"><td colspan="3"><strong>Subtotal:</strong></td><td><strong>R$ ${formatarMoedaBrasileira(subtotal)}</strong></td><td></td></tr></tbody></table></div>`;
-                    totalGeral += subtotal;
-                }
+    function renderBudget() {
+    const container = document.getElementById('budgetContainer');
+    if (!container) return;
+    
+    if (budgetItems.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:#999; background:#f8f9fa; border-radius:12px;">📭 Nenhum item cadastrado no orçamento. Adicione itens abaixo.</div>';
+        return;
+    }
+    
+    const cats = ["1. Profissionais da área", "2. Prestadores de serviços", "3. Equipamentos, materiais, estruturas", "4. Logística", "5. Divulgação, mídia e comunicação", "6. Ações de acessibilidade", "7. Custo Administrativo", "8. Taxas e serviços"];
+    let totalGeral = 0;
+    let html = '';
+    
+    cats.forEach(cat => {
+        const itens = budgetItems.filter(i => i.categoria === cat);
+        if (itens.length > 0) {
+            let subtotal = 0;
+            
+            // Cabeçalho da categoria
+            html += `<div class="budget-category" style="margin-bottom: 25px; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden;">`;
+            html += `<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 15px; font-weight: bold; font-size: 16px;">📁 ${escapeHtml(cat)}</div>`;
+            html += `<div style="overflow-x: auto;">`;
+            html += `<table style="width: 100%; border-collapse: collapse;">`;
+            html += `<thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #667eea;">
+                            <th style="padding: 10px; text-align: left;">Nº</th>
+                            <th style="padding: 10px; text-align: left;">Descrição do Item</th>
+                            <th style="padding: 10px; text-align: center;">Quantidade</th>
+                            <th style="padding: 10px; text-align: center;">Qtd de Unidade</th>
+                            <th style="padding: 10px; text-align: left;">Unidade</th>
+                            <th style="padding: 10px; text-align: right;">Valor Unitário</th>
+                            <th style="padding: 10px; text-align: right;">Valor Total</th>
+                            <th style="padding: 10px; text-align: center;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            itens.forEach((item) => {
+                const gIdx = budgetItems.findIndex(i => i === item);
+                subtotal += item.valorTotal;
+                totalGeral += item.valorTotal;
+                
+                const quantidadeFormatada = item.quantidade.toLocaleString('pt-BR');
+                const qtdUnidadeFormatada = item.qtdUnidade.toLocaleString('pt-BR');
+                
+                html += `<tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px; vertical-align: top;">${escapeHtml(item.numero || '-')}</td>
+                    <td style="padding: 10px; vertical-align: top;"><strong>${escapeHtml(item.descricao)}</strong></td>
+                    <td style="padding: 10px; text-align: center; vertical-align: top;">${quantidadeFormatada}</td>
+                    <td style="padding: 10px; text-align: center; vertical-align: top;">${qtdUnidadeFormatada}</td>
+                    <td style="padding: 10px; vertical-align: top;">${escapeHtml(item.unidade)}</td>
+                    <td style="padding: 10px; text-align: right; vertical-align: top;">R$ ${formatarMoedaBrasileira(item.valorUnitario)}</td>
+                    <td style="padding: 10px; text-align: right; vertical-align: top;"><strong style="color: #28a745;">R$ ${formatarMoedaBrasileira(item.valorTotal)}</strong></td>
+                    <td style="padding: 10px; text-align: center; vertical-align: top;">
+                        <button onclick="removeBudgetItem(${gIdx})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;">🗑️</button>
+                    </td>
+                </tr>`;
             });
-            if (budgetItems.length === 0) html = '<p style="text-align:center; color:#999;">Nenhum item cadastrado</p>';
-            html += `<div style="text-align:center; margin-top:20px;"><strong style="font-size:20px;">💰 TOTAL: R$ ${formatarMoedaBrasileira(totalGeral)}</strong></div>`;
-            container.innerHTML = html;
+            
+            // Subtotal da categoria
+            html += `<tr style="background: #f0f8ff; border-top: 1px solid #667eea;">
+                <td colspan="6" style="padding: 10px; text-align: right; font-weight: bold;">🔹 SUBTOTAL:</td>
+                <td style="padding: 10px; text-align: right; font-weight: bold; color: #667eea;">R$ ${formatarMoedaBrasileira(subtotal)}</td>
+                <td style="padding: 10px;"></td>
+            </tr>`;
+            
+            html += `</tbody>
+                    </table>
+                </div>
+            </div>`;
         }
+    });
+    
+    // Total Geral
+html += `<div style="margin-top: 20px; background: linear-gradient(135deg, #e8f5e9 0%, #d4edda 100%); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #28a745;">
+    <strong style="font-size: 18px;">💰 TOTAL GERAL DO PROJETO: R$ ${formatarMoedaBrasileira(totalGeral)}</strong>
+    </div>`;
+    
+    container.innerHTML = html;
+}
         
         function clearBudget() { budgetItems = []; renderBudget(); atualizarNumeroItem(); }
         function loadBudgetData(data) { budgetItems = data || []; renderBudget(); atualizarNumeroItem(); }
