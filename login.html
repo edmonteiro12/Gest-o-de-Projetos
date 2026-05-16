@@ -5,190 +5,209 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Gestão de Projetos</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
             padding: 20px;
         }
-        .login-box {
+
+        .login-container {
             background: white;
-            padding: 40px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
             width: 100%;
-            max-width: 400px;
-            text-align: center;
+            max-width: 450px;
         }
-        .login-box h2 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 24px;
-        }
-        .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .login-box button {
-            width: 100%;
-            padding: 12px;
+
+        .login-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .login-body {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
-        .login-box button:hover {
+
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        .error-msg {
-            color: #dc3545;
-            margin-top: 10px;
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             font-size: 14px;
+            display: none;
         }
-        .info-text {
-            font-size: 12px;
-            color: #666;
-            margin-top: 20px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .warning-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        @media (max-width: 480px) {
+            .login-body {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="loginPage" class="login-container">
-        <div class="login-box">
-            <h2>🎬 Gestão de Projetos</h2>
-            <input type="text" id="loginUser" placeholder="Login" value="">
-            <input type="password" id="loginPass" placeholder="Senha" value>
-            <button onclick="doLogin()">Entrar no Sistema</button>
-            <div id="loginError" class="error-msg"></div>
-            <div class="info-text">
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🎭 Gestão de Projetos</h1>
+            <p>Sistema de Controle de Projetos Culturais</p>
+        </div>
+
+        <div class="login-body">
+            <div class="warning-info">
+                ⚠️ <strong>Importante:</strong> Seu acesso é gerenciado pelo administrador. Entre em contato para obter suas credenciais.
             </div>
+
+            <div id="loginMessage" class="message"></div>
+
+            <div class="form-group">
+                <label>Usuário</label>
+                <input type="text" id="loginUsername" placeholder="Digite seu usuário" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="loginPassword" placeholder="Digite sua senha" autocomplete="current-password">
+            </div>
+
+            <button class="btn" onclick="handleLogin()">Entrar</button>
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script>
-        function doLogin() {
-            const login = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value;
-            const errorDiv = document.getElementById('loginError');
+        let redirecting = false;
+
+        function handleLogin() {
+            if (redirecting) return;
             
-            // Limpar erro anterior
-            errorDiv.textContent = '';
-            
-                      
-            // 2. Verificar usuários criados no admin.html (chave 'users')
-            try {
-                const adminUsers = JSON.parse(localStorage.getItem('users') || '[]');
-                console.log('Usuários encontrados:', adminUsers); // Para debug
-                
-                // Procurar usuário por login e senha
-                const adminUser = adminUsers.find(u => u.login === login && u.senha === password);
-                
-                if (adminUser) {
-                    // Verificar se o usuário está bloqueado
-                    if (adminUser.status === 'bloqueado') {
-                        errorDiv.textContent = 'Usuário bloqueado! Entre em contato com o administrador.';
-                        return;
-                    }
-                    
-                    // Salvar na sessão
-                    sessionStorage.setItem('currentUser', JSON.stringify({ 
-                        email: adminUser.login, 
-                        name: adminUser.nome 
-                    }));
-                    
-                    // Também salvar no cultureUsers para compatibilidade
-                    let cultureUsers = JSON.parse(localStorage.getItem('cultureUsers') || '[]');
-                    if (!cultureUsers.find(u => u.email === adminUser.login)) {
-                        cultureUsers.push({
-                            email: adminUser.login,
-                            password: adminUser.senha,
-                            name: adminUser.nome
-                        });
-                        localStorage.setItem('cultureUsers', JSON.stringify(cultureUsers));
-                    }
-                    
-                    window.location.href = 'index.html';
-                    return;
-                }
-            } catch (e) {
-                console.error('Erro ao ler usuários:', e);
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+
+            if (!username || !password) {
+                showMessage(messageDiv, 'Por favor, preencha todos os campos', 'error');
+                return;
             }
-            
-            // 3. Verificar usuários do cultureUsers
-            try {
-                const cultureUsers = JSON.parse(localStorage.getItem('cultureUsers') || '[]');
-                const cultureUser = cultureUsers.find(u => u.email === login && u.password === password);
-                
-                if (cultureUser) {
-                    sessionStorage.setItem('currentUser', JSON.stringify({ 
-                        email: cultureUser.email, 
-                        name: cultureUser.name 
-                    }));
-                    window.location.href = 'index.html';
-                    return;
-                }
-            } catch (e) {
-                console.error('Erro ao ler cultureUsers:', e);
+
+            const result = auth.login(username, password);
+
+            if (result.success) {
+                redirecting = true;
+                showMessage(messageDiv, '✅ ' + result.message, 'success');
+                setTimeout(() => {
+                    window.location.replace('index.html');
+                }, 1000);
+            } else {
+                showMessage(messageDiv, '❌ ' + result.message, 'error');
             }
-            
-            // Se chegou aqui, não encontrou o usuário
-            errorDiv.textContent = 'Login ou senha inválidos!';
         }
-        
-        // Função para criar um usuário de teste no admin.html (ajuda para debug)
-        function criarUsuarioTeste() {
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
-            
-            // Verificar se o usuário teste já existe
-            if (!users.find(u => u.login === 'teste')) {
-                users.push({
-                    nome: 'Usuário Teste',
-                    documento: '12345678901',
-                    login: 'teste',
-                    senha: '123456',
-                    status: 'ativo',
-                    senhaAtualizada: true
+
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = 'message ' + type;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('loginPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleLogin();
                 });
-                localStorage.setItem('users', JSON.stringify(users));
-                console.log('Usuário teste criado: teste / 123456');
             }
-        }
-        
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', function() {
-            // Criar usuário de teste para facilitar os testes
-            criarUsuarioTeste();
-            
-            // Permitir tecla Enter
-            document.getElementById('loginPass').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') doLogin();
-            });
-            document.getElementById('loginUser').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') doLogin();
-            });
+
+            // Clear any existing session before showing login page
+            sessionStorage.removeItem('currentUser');
+            localStorage.removeItem('current_user');
         });
     </script>
 </body>

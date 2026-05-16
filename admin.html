@@ -10,36 +10,47 @@
         .login-box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 400px; text-align: center; }
         .login-box h2 { color: #333; margin-bottom: 30px; }
         .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .login-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .login-box button { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
         .login-box button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .error-msg { color: red; margin-top: 10px; font-size: 14px; }
 
         .admin-panel { display: none; padding: 20px; background: #f8f9fa; min-height: 100vh; }
-        .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 10px; margin-bottom: 20px; }
         .logo { font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .logout-btn { background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .logout-btn:hover { background: #c82333; }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
-        .tab { padding: 10px 20px; cursor: pointer; background: #e9ecef; border-radius: 8px 8px 0 0; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; cursor: pointer; background: #e9ecef; border-radius: 8px 8px 0 0; transition: all 0.3s; }
         .tab.active { background: #667eea; color: white; }
 
         .tab-content { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        button:hover { background: #218838; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        button:hover { background: #218838; transform: translateY(-1px); }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background: #f8f9fa; }
-        .status { padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+        .status { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; }
         .ativo { background: #d4edda; color: #155724; }
         .bloqueado { background: #f8d7da; color: #721c24; }
-        .btn-small { padding: 5px 12px; margin: 2px; font-size: 12px; background: #0066cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        .btn-small:hover { background: #0052a3; }
-        .btn-edit { background: #007bff; }
-        .btn-block { background: #dc3545; }
-        .btn-unlock { background: #28a745; }
+        .expirado { background: #ffc107; color: #856404; }
+        .btn-small { padding: 5px 12px; margin: 2px; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; display: inline-block; }
+        .btn-edit { background: #007bff; color: white; }
+        .btn-edit:hover { background: #0056b3; }
+        .btn-block { background: #dc3545; color: white; }
+        .btn-block:hover { background: #c82333; }
+        .btn-unlock { background: #28a745; color: white; }
+        .btn-unlock:hover { background: #218838; }
+        .btn-delete { background: #e83e8c; color: white; }
+        .btn-delete:hover { background: #d63384; }
+        .btn-renew { background: #17a2b8; color: white; }
+        .btn-renew:hover { background: #138496; }
+        .btn-clear { background: #6c757d; color: white; }
+        .btn-clear:hover { background: #5a6268; }
+        
         .modal-edit { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-edit.show { display: flex; }
         .modal-edit-content { background: white; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
@@ -47,7 +58,29 @@
         .close-modal-edit { float: right; font-size: 24px; cursor: pointer; color: #999; }
         .close-modal-edit:hover { color: #000; }
         .history-item { background: #f9f9f9; padding: 15px; margin: 10px 0; border-left: 4px solid #667eea; border-radius: 5px; }
-        .history-time { font-size: 12px; color: #666; }
+        .history-time { font-size: 12px; color: #666; margin-top: 5px; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .checkbox-group input { width: auto; margin: 0; }
+        .checkbox-group label { margin: 0; cursor: pointer; }
+        .info-badge { background: #e8f4f8; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 13px; color: #0c5460; }
+        .dias-group { margin-top: 10px; }
+        .dias-group.disabled { opacity: 0.5; pointer-events: none; }
+        .acoes-cell { min-width: 320px; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; color: white; font-weight: bold; z-index: 2000; animation: slideIn 0.3s ease; }
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+        .notification.info { background: #17a2b8; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            table { font-size: 12px; }
+            .btn-small { padding: 3px 8px; font-size: 10px; }
+            .modal-edit-content { width: 90%; }
+            .acoes-cell { min-width: 250px; }
+        }
     </style>
 </head>
 <body>
@@ -63,44 +96,83 @@
 
     <div id="adminPanel" class="admin-panel">
         <div class="header">
-            <div class="logo">🎭 Painel Admin</div>
+            <div class="logo">🎭 Painel Administrativo</div>
             <button class="logout-btn" onclick="doAdminLogout()">Sair</button>
         </div>
         <div style="padding: 20px;">
             <div class="tabs">
-                <div class="tab active" onclick="showTab('cadastro')">Cadastro</div>
-                <div class="tab" onclick="showTab('gerenciar')">Gerenciar Usuários</div>
-                <div class="tab" onclick="showTab('historico')">Histórico</div>
+                <div class="tab active" onclick="showTab('cadastro')">➕ Cadastro Usuários</div>
+                <div class="tab" onclick="showTab('usuarios-demo')">👥 Usuários Demo</div>
+                <div class="tab" onclick="showTab('gerenciar')">📋 Gerenciar Usuários</div>
+                <div class="tab" onclick="showTab('historico')">📜 Histórico</div>
             </div>
+
+            <!-- ABA CADASTRO -->
             <div id="cadastro" class="tab-content">
                 <h3>Criar Novo Usuário</h3>
+                <div class="info-badge">
+                    ℹ️ Preencha os dados abaixo para criar um novo usuário no sistema.
+                </div>
                 <form id="userForm">
                     <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" id="nome" required>
+                        <label for="nome">Nome completo:</label>
+                        <input type="text" id="nome" required placeholder="Ex: João Silva">
                     </div>
                     <div class="form-group">
                         <label for="documento">CNPJ ou CPF:</label>
-                        <input type="text" id="documento" required>
+                        <input type="text" id="documento" required placeholder="000.000.000-00">
                     </div>
                     <div class="form-group">
-                        <label for="login">Login:</label>
-                        <input type="text" id="login" required>
+                        <label for="login">Login (usuário):</label>
+                        <input type="text" id="login" required placeholder="Ex: joao.silva">
                     </div>
                     <div class="form-group">
                         <label for="senha">Senha:</label>
-                        <input type="password" id="senha" required>
+                        <input type="password" id="senha" required placeholder="********">
                     </div>
-                    <button type="submit">Criar Usuário</button>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="acessoIlimitado" onchange="toggleDiasAcesso()">
+                        <label for="acessoIlimitado">🔓 Acesso Ilimitado (sem data de expiração)</label>
+                    </div>
+                    <div id="diasAcessoGroup" class="dias-group">
+                        <div class="form-group">
+                            <label for="diasAcesso">Dias de Acesso:</label>
+                            <input type="number" id="diasAcesso" value="30" min="1">
+                        </div>
+                    </div>
+                    <button type="submit">✅ Criar Usuário</button>
                 </form>
             </div>
-            <div id="gerenciar" class="tab-content" style="display: none;">
-                <h3>Gerenciar Usuários Cadastrados</h3>
-                <table id="gerenciarTable">
+
+            <!-- ABA USUÁRIOS DEMO -->
+            <div id="usuarios-demo" class="tab-content" style="display: none;">
+                <h3>Gerenciar Usuários de Demonstração</h3>
+                <div class="info-badge">
+                    ℹ️ Usuários demo são para testes. Eles têm data de EXPIRAÇÃO configurável. Após expirar, o acesso é bloqueado automaticamente.
+                </div>
+                <form id="demoUserForm">
+                    <div class="form-group">
+                        <label for="demoLogin">Login Demo:</label>
+                        <input type="text" id="demoLogin" placeholder="ex: usuario_teste" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="demoSenha">Senha Demo:</label>
+                        <input type="password" id="demoSenha" placeholder="senha123" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="demoDiasAcesso">Dias de Acesso (expira após):</label>
+                        <input type="number" id="demoDiasAcesso" value="30" min="1" required>
+                        <small style="color: #666;">Após este período, o usuário será bloqueado automaticamente</small>
+                    </div>
+                    <button type="submit">➕ Adicionar Usuário Demo</button>
+                </form>
+
+                <h3 style="margin-top: 30px;">👥 Usuários Demo Cadastrados</h3>
+                <table id="demoUsersTable">
                     <thead>
                         <tr>
-                            <th>Nome</th>
                             <th>Login</th>
+                            <th>Expira em</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
@@ -108,8 +180,34 @@
                     <tbody></tbody>
                 </table>
             </div>
+
+            <!-- ABA GERENCIAR -->
+            <div id="gerenciar" class="tab-content" style="display: none;">
+                <h3>📋 Gerenciar Usuários Cadastrados</h3>
+                <div class="info-badge">
+                    ℹ️ Gerencie usuários, edite senhas, bloqueie/desbloqueie, renove acessos ou remova usuários.
+                </div>
+                <table id="gerenciarTable">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Login</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Expiração</th>
+                            <th class="acoes-cell">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- ABA HISTÓRICO -->
             <div id="historico" class="tab-content" style="display: none;">
-                <h3>Histórico de Atualizações</h3>
+                <h3>📜 Histórico de Atualizações</h3>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn-clear" onclick="limparHistorico()">🗑️ Limpar Histórico</button>
+                </div>
                 <div id="historicoContainer" style="max-height: 500px; overflow-y: auto;"></div>
             </div>
         </div>
@@ -119,24 +217,138 @@
     <div id="editPasswordModal" class="modal-edit">
         <div class="modal-edit-content">
             <span class="close-modal-edit" onclick="closeEditModal()">&times;</span>
-            <h3>Editar Senha</h3>
+            <h3>✏️ Editar Senha</h3>
             <form id="editPasswordForm">
                 <div class="form-group">
                     <label for="editUserLogin">Login:</label>
-                    <input type="text" id="editUserLogin" disabled>
+                    <input type="text" id="editUserLogin" disabled style="background: #f0f0f0;">
                 </div>
                 <div class="form-group">
                     <label for="editPassword">Nova Senha:</label>
-                    <input type="password" id="editPassword" required>
+                    <input type="password" id="editPassword" required placeholder="Digite a nova senha">
                 </div>
-                <button type="submit" style="width: 100%; margin-top: 15px;">Atualizar Senha</button>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Senha:</label>
+                    <input type="password" id="confirmPassword" required placeholder="Confirme a nova senha">
+                </div>
+                <button type="submit">💾 Salvar Senha</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL RENOVAR ACESSO -->
+    <div id="renewAccessModal" class="modal-edit">
+        <div class="modal-edit-content">
+            <span class="close-modal-edit" onclick="closeRenewModal()">&times;</span>
+            <h3>🔄 Renovar Acesso</h3>
+            <form id="renewAccessForm">
+                <div class="form-group">
+                    <label for="renewUserLogin">Login:</label>
+                    <input type="text" id="renewUserLogin" disabled style="background: #f0f0f0;">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="renewIlimitado" onchange="toggleRenewDias()">
+                    <label for="renewIlimitado">🔓 Tornar acesso ilimitado</label>
+                </div>
+                <div id="renewDiasGroup" class="dias-group">
+                    <div class="form-group">
+                        <label for="renewDays">Adicionar Dias:</label>
+                        <input type="number" id="renewDays" value="30" min="1">
+                    </div>
+                </div>
+                <button type="submit">🔄 Renovar Acesso</button>
             </form>
         </div>
     </div>
 
     <script>
         let currentEditingUser = null;
-        const ADMIN_PASSWORD = 'admin123'; // Alterar em produção
+        let currentReviewingUser = null;
+        let currentEditingUserType = null; // 'normal' or 'demo'
+        let currentEditingDemoIndex = null;
+        const ADMIN_PASSWORD = 'admin123';
+
+        // Função de notificação
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Alternar campo de dias no cadastro
+        function toggleDiasAcesso() {
+            const isIlimitado = document.getElementById('acessoIlimitado').checked;
+            const diasGroup = document.getElementById('diasAcessoGroup');
+            const diasInput = document.getElementById('diasAcesso');
+            if (isIlimitado) {
+                diasGroup.classList.add('disabled');
+                diasInput.disabled = true;
+            } else {
+                diasGroup.classList.remove('disabled');
+                diasInput.disabled = false;
+            }
+        }
+
+        // Alternar campo de dias na renovação
+        function toggleRenewDias() {
+            const isIlimitado = document.getElementById('renewIlimitado').checked;
+            const diasGroup = document.getElementById('renewDiasGroup');
+            const daysInput = document.getElementById('renewDays');
+            if (isIlimitado) {
+                diasGroup.classList.add('disabled');
+                daysInput.disabled = true;
+            } else {
+                diasGroup.classList.remove('disabled');
+                daysInput.disabled = false;
+            }
+        }
+
+        // Verificar e atualizar expiração de usuários demo
+        function verificarExpiracaoDemoUsers() {
+            let demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            let atualizado = false;
+            
+            demoUsers = demoUsers.map(user => {
+                if (user.dataExpiracao && !user.acessoIlimitado) {
+                    const expireDate = new Date(user.dataExpiracao);
+                    if (new Date() > expireDate && user.status !== 'expirado') {
+                        user.status = 'expirado';
+                        atualizado = true;
+                        addToHistory(`⏰ Usuário demo ${user.login} EXPIRou automaticamente em ${new Date().toLocaleString('pt-BR')}`);
+                    }
+                }
+                return user;
+            });
+            
+            if (atualizado) {
+                localStorage.setItem('demoUsers', JSON.stringify(demoUsers));
+                syncUsersWithIndex();
+            }
+        }
+
+        // Garantir que o usuário admin existe
+        function ensureAdminUser() {
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const adminExists = users.find(u => u.login === 'admin');
+            if (!adminExists) {
+                users.push({
+                    nome: 'Administrador',
+                    documento: '000.000.000-00',
+                    login: 'admin',
+                    senha: 'admin123',
+                    status: 'ativo',
+                    tipo: 'admin',
+                    dataExpiracao: null,
+                    acessoIlimitado: true
+                });
+                localStorage.setItem('users', JSON.stringify(users));
+                addToHistory('👑 Usuário administrador padrão criado');
+            }
+        }
 
         // Sincronizar usuários com index
         function syncUsersWithIndex() {
@@ -145,25 +357,66 @@
             let atualizado = false;
             
             adminUsers.forEach(adminUser => {
-                if (adminUser.status !== 'bloqueado') {
-                    const existe = cultureUsers.find(u => u.email === adminUser.login);
-                    if (!existe) {
-                        cultureUsers.push({
-                            email: adminUser.login,
-                            password: adminUser.senha,
-                            name: adminUser.nome
-                        });
-                        atualizado = true;
-                    } else if (existe.password !== adminUser.senha) {
-                        existe.password = adminUser.senha;
-                        atualizado = true;
+                if (adminUser.status !== 'bloqueado' && adminUser.status !== 'expirado') {
+                    let acessoValido = true;
+                    if (adminUser.dataExpiracao && !adminUser.acessoIlimitado) {
+                        const expireDate = new Date(adminUser.dataExpiracao);
+                        if (new Date() > expireDate) {
+                            acessoValido = false;
+                        }
+                    }
+
+                    if (acessoValido) {
+                        const existe = cultureUsers.find(u => u.email === adminUser.login);
+                        if (!existe) {
+                            cultureUsers.push({
+                                email: adminUser.login,
+                                password: adminUser.senha,
+                                name: adminUser.nome
+                            });
+                            atualizado = true;
+                        } else if (existe.password !== adminUser.senha) {
+                            existe.password = adminUser.senha;
+                            atualizado = true;
+                        }
                     }
                 }
             });
             
+            const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            demoUsers.forEach(demoUser => {
+                let acessoValido = true;
+                if (demoUser.dataExpiracao && !demoUser.acessoIlimitado) {
+                    const expireDate = new Date(demoUser.dataExpiracao);
+                    if (new Date() > expireDate) {
+                        acessoValido = false;
+                    }
+                }
+                
+                if (acessoValido && demoUser.status !== 'bloqueado') {
+                    const existe = cultureUsers.find(u => u.email === demoUser.login);
+                    if (!existe) {
+                        cultureUsers.push({
+                            email: demoUser.login,
+                            password: demoUser.senha,
+                            name: 'Demo User'
+                        });
+                        atualizado = true;
+                    } else if (existe.password !== demoUser.senha) {
+                        existe.password = demoUser.senha;
+                        atualizado = true;
+                    }
+                } else {
+                    const index = cultureUsers.findIndex(u => u.email === demoUser.login);
+                    if (index !== -1) {
+                        cultureUsers.splice(index, 1);
+                        atualizado = true;
+                    }
+                }
+            });
+
             if (atualizado) {
                 localStorage.setItem('cultureUsers', JSON.stringify(cultureUsers));
-                console.log('Usuários sincronizados com o sistema principal');
             }
         }
 
@@ -177,11 +430,15 @@
                 sessionStorage.setItem('adminLogado', 'true');
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
+                verificarExpiracaoDemoUsers();
                 loadUsers();
+                loadDemoUsers();
                 loadHistory();
                 errorDiv.textContent = '';
+                showNotification('✅ Login realizado com sucesso!', 'success');
             } else {
                 errorDiv.textContent = 'Login ou senha incorretos!';
+                showNotification('❌ Login ou senha incorretos!', 'error');
             }
         }
 
@@ -192,6 +449,7 @@
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('adminPass').value = '';
             document.getElementById('adminError').textContent = '';
+            showNotification('🔓 Logout realizado com sucesso!', 'info');
         }
 
         // Mostrar aba
@@ -206,12 +464,14 @@
 
             if (tabName === 'gerenciar') {
                 loadUsers();
+            } else if (tabName === 'usuarios-demo') {
+                loadDemoUsers();
             } else if (tabName === 'historico') {
                 loadHistory();
             }
         }
 
-        // Carregar usuários
+        // Carregar usuários normais
         function loadUsers() {
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             const tbody = document.querySelector('#gerenciarTable tbody');
@@ -219,55 +479,227 @@
 
             users.forEach((user, index) => {
                 const row = document.createElement('tr');
-                const statusClass = user.status === 'ativo' ? 'ativo' : 'bloqueado';
+                let statusClass = 'ativo';
+                let statusText = 'Ativo';
+                let expiracaoText = 'Ilimitado';
+                let tipoText = user.tipo === 'admin' ? '👑 Admin' : '📋 Normal';
+                
+                if (user.login === 'admin') {
+                    tipoText = '👑 Administrador';
+                }
+                
+                if (!user.acessoIlimitado && user.dataExpiracao) {
+                    const expireDate = new Date(user.dataExpiracao);
+                    expiracaoText = expireDate.toLocaleDateString('pt-BR');
+                    if (new Date() > expireDate) {
+                        statusClass = 'expirado';
+                        statusText = 'Expirado';
+                    }
+                }
+                
+                if (user.status === 'bloqueado') {
+                    statusClass = 'bloqueado';
+                    statusText = 'Bloqueado';
+                }
+
                 row.innerHTML = `
-                    <td>${user.nome}</td>
-                    <td>${user.login}</td>
-                    <td><span class="status ${statusClass}">${user.status}</span></td>
-                    <td>
-                        <button class="btn-small btn-edit" onclick="editPassword(${index})">Editar Senha</button>
-                        <button class="btn-small btn-block" onclick="toggleStatus(${index})">${user.status === 'bloqueado' ? 'Desbloquear' : 'Bloquear'}</button>
+                    <td>${escapeHtml(user.nome)}</td>
+                    <td><strong>${escapeHtml(user.login)}</strong></td>
+                    <td>${tipoText}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>${expiracaoText}</td>
+                    <td class="acoes-cell">
+                        <button class="btn-small btn-edit" onclick="editPassword(${index}, 'normal')" title="Editar Senha">🔑 Editar Senha</button>
+                        <button class="btn-small ${user.status === 'bloqueado' ? 'btn-unlock' : 'btn-block'}" onclick="toggleStatus(${index})" title="${user.status === 'bloqueado' ? 'Desbloquear' : 'Bloquear'}">
+                            ${user.status === 'bloqueado' ? '🔓 Desbloquear' : '🔒 Bloquear'}
+                        </button>
+                        <button class="btn-small btn-renew" onclick="openRenewModal(${index}, 'normal')" title="Renovar Acesso">🔄 Renovar</button>
+                        <button class="btn-small btn-delete" onclick="deleteUser(${index})" title="Deletar Usuário">🗑️ Deletar</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        // Editar senha
-        function editPassword(index) {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            currentEditingUser = index;
-            document.getElementById('editUserLogin').value = users[index].login;
+        // Carregar usuários demo
+        function loadDemoUsers() {
+            const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            const tbody = document.querySelector('#demoUsersTable tbody');
+            tbody.innerHTML = '';
+
+            demoUsers.forEach((user, index) => {
+                const row = document.createElement('tr');
+                let statusClass = 'ativo';
+                let statusText = 'Ativo';
+                let expiracaoText = 'Ilimitado';
+                
+                if (user.dataExpiracao && !user.acessoIlimitado) {
+                    const expireDate = new Date(user.dataExpiracao);
+                    expiracaoText = expireDate.toLocaleDateString('pt-BR');
+                    if (new Date() > expireDate) {
+                        statusClass = 'expirado';
+                        statusText = 'Expirado';
+                    }
+                }
+                
+                if (user.status === 'bloqueado') {
+                    statusClass = 'bloqueado';
+                    statusText = 'Bloqueado';
+                }
+                
+                row.innerHTML = `
+                    <td><strong>${escapeHtml(user.login)}</strong></td>
+                    <td>${expiracaoText}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn-small btn-edit" onclick="editPassword(${index}, 'demo')" title="Editar Senha">🔑 Editar Senha</button>
+                        <button class="btn-small btn-renew" onclick="renewDemoUser(${index})" title="Renovar Acesso">🔄 Renovar</button>
+                        <button class="btn-small btn-delete" onclick="deleteDemoUser(${index})" title="Deletar Usuário">🗑️ Deletar</button>
+                     </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Editar senha (suporta normal e demo)
+        function editPassword(index, type) {
+            currentEditingUserType = type;
+            if (type === 'normal') {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                currentEditingUser = index;
+                document.getElementById('editUserLogin').value = users[index].login;
+            } else {
+                const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+                currentEditingDemoIndex = index;
+                document.getElementById('editUserLogin').value = demoUsers[index].login;
+            }
             document.getElementById('editPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
             document.getElementById('editPasswordModal').classList.add('show');
         }
 
-        // Fechar modal
+        // Fechar modal de edição
         function closeEditModal() {
             document.getElementById('editPasswordModal').classList.remove('show');
             currentEditingUser = null;
+            currentEditingDemoIndex = null;
+            currentEditingUserType = null;
         }
 
-        // Alternar status
+        // Abrir modal renovar acesso
+        function openRenewModal(index, type) {
+            if (type === 'normal') {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                currentReviewingUser = index;
+                document.getElementById('renewUserLogin').value = users[index].login;
+                document.getElementById('renewDays').value = '30';
+                document.getElementById('renewIlimitado').checked = users[index].acessoIlimitado || false;
+            } else {
+                const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+                currentReviewingUser = index;
+                document.getElementById('renewUserLogin').value = demoUsers[index].login;
+                document.getElementById('renewDays').value = '30';
+                document.getElementById('renewIlimitado').checked = demoUsers[index].acessoIlimitado || false;
+            }
+            toggleRenewDias();
+            document.getElementById('renewAccessModal').classList.add('show');
+        }
+
+        // Fechar modal renovar
+        function closeRenewModal() {
+            document.getElementById('renewAccessModal').classList.remove('show');
+            currentReviewingUser = null;
+        }
+
+        // Alternar status (bloquear/desbloquear)
         function toggleStatus(index) {
             let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const oldStatus = users[index].status;
             users[index].status = users[index].status === 'bloqueado' ? 'ativo' : 'bloqueado';
             localStorage.setItem('users', JSON.stringify(users));
             
             syncUsersWithIndex();
             
-            const action = users[index].status === 'bloqueado' ? 'bloqueado' : 'desbloqueado';
-            addToHistory(`${users[index].nome} (${users[index].login}) foi ${action}`);
+            const action = users[index].status === 'bloqueado' ? 'BLOQUEADO' : 'DESBLOQUEADO';
+            addToHistory(`🔒 Usuário ${users[index].nome} (${users[index].login}) foi ${action} em ${new Date().toLocaleString('pt-BR')}`);
             
             loadUsers();
+            showNotification(`✅ Usuário ${action === 'BLOQUEADO' ? 'bloqueado' : 'desbloqueado'} com sucesso!`, 'success');
         }
 
-        // Adicionar ao histórico
+        // Deletar usuário normal
+        function deleteUser(index) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userName = users[index].login;
+            const userNome = users[index].nome;
+            
+            if (confirm(`Tem certeza que deseja DELETAR o usuário "${userNome}" (${userName})? Esta ação não pode ser desfeita!`)) {
+                users.splice(index, 1);
+                localStorage.setItem('users', JSON.stringify(users));
+                syncUsersWithIndex();
+                addToHistory(`🗑️ Usuário ${userNome} (${userName}) foi DELETADO do sistema em ${new Date().toLocaleString('pt-BR')}`);
+                loadUsers();
+                showNotification(`✅ Usuário ${userNome} deletado com sucesso!`, 'success');
+            }
+        }
+
+        // Deletar usuário demo
+        function deleteDemoUser(index) {
+            const demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            const userName = demoUsers[index].login;
+            
+            if (confirm(`Tem certeza que deseja deletar o usuário demo "${userName}"?`)) {
+                demoUsers.splice(index, 1);
+                localStorage.setItem('demoUsers', JSON.stringify(demoUsers));
+                syncUsersWithIndex();
+                addToHistory(`🗑️ Usuário demo ${userName} foi DELETADO em ${new Date().toLocaleString('pt-BR')}`);
+                loadDemoUsers();
+                showNotification(`✅ Usuário demo ${userName} deletado com sucesso!`, 'success');
+            }
+        }
+
+        // Renovar usuário demo
+        function renewDemoUser(index) {
+            const dias = prompt('Quantos dias de acesso deseja adicionar?', '30');
+            if (dias && parseInt(dias) > 0) {
+                let demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+                const user = demoUsers[index];
+                
+                let dataExpiracao = new Date();
+                if (user.dataExpiracao && new Date(user.dataExpiracao) > dataExpiracao) {
+                    dataExpiracao = new Date(user.dataExpiracao);
+                }
+                dataExpiracao.setDate(dataExpiracao.getDate() + parseInt(dias));
+                
+                demoUsers[index].dataExpiracao = dataExpiracao.toISOString();
+                demoUsers[index].status = 'ativo';
+                demoUsers[index].acessoIlimitado = false;
+                
+                localStorage.setItem('demoUsers', JSON.stringify(demoUsers));
+                syncUsersWithIndex();
+                addToHistory(`🔄 Usuário demo ${user.login} teve acesso RENOVADO até ${dataExpiracao.toLocaleDateString('pt-BR')} em ${new Date().toLocaleString('pt-BR')}`);
+                loadDemoUsers();
+                showNotification(`✅ Acesso renovado até ${dataExpiracao.toLocaleDateString('pt-BR')}`, 'success');
+            }
+        }
+
+        // Adicionar ao histórico com data/hora
         function addToHistory(message) {
             let history = JSON.parse(localStorage.getItem('adminHistory') || '[]');
             const timestamp = new Date().toLocaleString('pt-BR');
-            history.push({ message, timestamp });
+            history.unshift({ message, timestamp });
+            if (history.length > 100) history = history.slice(0, 100);
             localStorage.setItem('adminHistory', JSON.stringify(history));
+        }
+
+        // Limpar histórico
+        function limparHistorico() {
+            if (confirm('Tem certeza que deseja LIMPAR TODO o histórico? Esta ação não pode ser desfeita!')) {
+                localStorage.removeItem('adminHistory');
+                addToHistory(`🧹 Histórico foi LIMPO pelo administrador em ${new Date().toLocaleString('pt-BR')}`);
+                loadHistory();
+                showNotification('✅ Histórico limpo com sucesso!', 'success');
+            }
         }
 
         // Carregar histórico
@@ -277,77 +709,221 @@
             container.innerHTML = '';
 
             if (history.length === 0) {
-                container.innerHTML = '<p>Sem histórico de atualizações</p>';
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">📭 Nenhum registro no histórico</p>';
                 return;
             }
 
-            history.reverse().forEach(item => {
+            history.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
                 div.innerHTML = `
-                    <strong>${item.message}</strong>
-                    <div class="history-time">${item.timestamp}</div>
+                    <strong>📌 ${escapeHtml(item.message)}</strong>
+                    <div class="history-time">🕐 ${item.timestamp}</div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // Formulário de criar usuário
+        // Formulário criar usuário normal
         document.getElementById('userForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const nome = document.getElementById('nome').value;
             const documento = document.getElementById('documento').value;
             const login = document.getElementById('login').value;
             const senha = document.getElementById('senha').value;
+            const acessoIlimitado = document.getElementById('acessoIlimitado').checked;
+            const diasAcesso = parseInt(document.getElementById('diasAcesso').value);
 
             let users = JSON.parse(localStorage.getItem('users') || '[]');
             const existingUser = users.find(u => u.login === login);
             if (existingUser) {
-                alert('Login já existe!');
+                showNotification('❌ Login já existe! Escolha outro.', 'error');
                 return;
             }
 
-            users.push({ nome, documento, login, senha, status: 'ativo', senhaAtualizada: false });
+            let dataExpiracao = null;
+            let expiracaoMsg = '';
+            
+            if (!acessoIlimitado) {
+                dataExpiracao = new Date();
+                dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
+                expiracaoMsg = `acesso até ${dataExpiracao.toLocaleDateString('pt-BR')}`;
+            } else {
+                expiracaoMsg = 'acesso ILIMITADO';
+            }
+
+            users.push({ 
+                nome, 
+                documento, 
+                login, 
+                senha, 
+                status: 'ativo', 
+                tipo: 'normal',
+                dataExpiracao: dataExpiracao ? dataExpiracao.toISOString() : null,
+                acessoIlimitado: acessoIlimitado
+            });
             localStorage.setItem('users', JSON.stringify(users));
             
             syncUsersWithIndex();
             
-            addToHistory(`Novo usuário ${nome} (${login}) foi criado`);
+            addToHistory(`✅ NOVO USUÁRIO: ${nome} (${login}) foi criado com ${expiracaoMsg} em ${new Date().toLocaleString('pt-BR')}`);
             
-            alert('Usuário criado com sucesso! Agora ele pode fazer login no sistema.');
+            showNotification(`✅ Usuário criado com sucesso!\n📌 Login: ${login}\n🔑 Senha: ${senha}`, 'success');
+            
+            // Limpar formulário
             document.getElementById('userForm').reset();
+            document.getElementById('acessoIlimitado').checked = false;
+            document.getElementById('diasAcesso').value = '30';
+            document.getElementById('diasAcesso').disabled = false;
+            document.getElementById('diasAcessoGroup').classList.remove('disabled');
             loadUsers();
         });
 
-        // Formulário de editar senha
+        // Formulário criar usuário demo
+        document.getElementById('demoUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const demoLogin = document.getElementById('demoLogin').value;
+            const demoSenha = document.getElementById('demoSenha').value;
+            const diasAcesso = parseInt(document.getElementById('demoDiasAcesso').value);
+
+            let demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+            const existingDemoUser = demoUsers.find(u => u.login === demoLogin);
+            if (existingDemoUser) {
+                showNotification('❌ Login demo já existe!', 'error');
+                return;
+            }
+
+            const dataExpiracao = new Date();
+            dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
+
+            demoUsers.push({ 
+                login: demoLogin, 
+                senha: demoSenha,
+                status: 'ativo',
+                tipo: 'demo',
+                dataExpiracao: dataExpiracao.toISOString(),
+                acessoIlimitado: false,
+                diasAcesso: diasAcesso
+            });
+            localStorage.setItem('demoUsers', JSON.stringify(demoUsers));
+            
+            syncUsersWithIndex();
+            
+            addToHistory(`👥 NOVO USUÁRIO DEMO: ${demoLogin} foi criado com acesso até ${dataExpiracao.toLocaleDateString('pt-BR')} em ${new Date().toLocaleString('pt-BR')}`);
+            
+            showNotification(`✅ Usuário demo adicionado!\n📌 Login: ${demoLogin}\n🔑 Senha: ${demoSenha}\n📅 Expira em: ${dataExpiracao.toLocaleDateString('pt-BR')}`, 'success');
+            
+            document.getElementById('demoUserForm').reset();
+            document.getElementById('demoDiasAcesso').value = '30';
+            loadDemoUsers();
+        });
+
+        // Formulário editar senha
         document.getElementById('editPasswordForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
             const newPassword = document.getElementById('editPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const userLogin = document.getElementById('editUserLogin').value;
             
             if (!newPassword || newPassword.trim() === '') {
-                alert('Digite uma nova senha!');
+                showNotification('❌ Digite uma nova senha!', 'error');
                 return;
             }
             
-            users[currentEditingUser].senha = newPassword;
+            if (newPassword !== confirmPassword) {
+                showNotification('❌ As senhas não coincidem!', 'error');
+                return;
+            }
+            
+            if (currentEditingUserType === 'normal') {
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                users[currentEditingUser].senha = newPassword;
+                localStorage.setItem('users', JSON.stringify(users));
+                addToHistory(`🔑 Senha do usuário ${users[currentEditingUser].nome} (${userLogin}) foi ALTERADA em ${new Date().toLocaleString('pt-BR')}`);
+                loadUsers();
+            } else {
+                let demoUsers = JSON.parse(localStorage.getItem('demoUsers') || '[]');
+                demoUsers[currentEditingDemoIndex].senha = newPassword;
+                localStorage.setItem('demoUsers', JSON.stringify(demoUsers));
+                addToHistory(`🔑 Senha do usuário demo ${userLogin} foi ALTERADA em ${new Date().toLocaleString('pt-BR')}`);
+                loadDemoUsers();
+            }
+            
+            syncUsersWithIndex();
+            showNotification(`✅ Senha do usuário ${userLogin} atualizada com sucesso!`, 'success');
+            closeEditModal();
+        });
+
+        // Formulário renovar acesso
+        document.getElementById('renewAccessForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const tornarIlimitado = document.getElementById('renewIlimitado').checked;
+            const renewDays = parseInt(document.getElementById('renewDays').value);
+            const userLogin = document.getElementById('renewUserLogin').value;
+            
+            if (!tornarIlimitado && (!renewDays || renewDays < 1)) {
+                showNotification('❌ Digite uma quantidade válida de dias!', 'error');
+                return;
+            }
+            
+            let dataExpiracao = null;
+            let mensagem = '';
+            
+            if (tornarIlimitado) {
+                users[currentReviewingUser].acessoIlimitado = true;
+                users[currentReviewingUser].dataExpiracao = null;
+                mensagem = 'ACESSO ILIMITADO';
+            } else {
+                users[currentReviewingUser].acessoIlimitado = false;
+                let dataAtual = new Date();
+                if (users[currentReviewingUser].dataExpiracao && new Date(users[currentReviewingUser].dataExpiracao) > dataAtual) {
+                    dataAtual = new Date(users[currentReviewingUser].dataExpiracao);
+                }
+                dataExpiracao = new Date(dataAtual);
+                dataExpiracao.setDate(dataExpiracao.getDate() + renewDays);
+                users[currentReviewingUser].dataExpiracao = dataExpiracao.toISOString();
+                mensagem = `renovado até ${dataExpiracao.toLocaleDateString('pt-BR')}`;
+            }
+            
+            users[currentReviewingUser].status = 'ativo';
             localStorage.setItem('users', JSON.stringify(users));
             
             syncUsersWithIndex();
             
-            addToHistory(`Senha do usuário ${users[currentEditingUser].nome} (${users[currentEditingUser].login}) foi alterada`);
+            addToHistory(`🔄 Acesso do usuário ${users[currentReviewingUser].nome} (${userLogin}) foi ${mensagem} em ${new Date().toLocaleString('pt-BR')}`);
             
-            alert('Senha atualizada com sucesso!');
-            closeEditModal();
+            showNotification(`✅ Acesso renovado com sucesso!\n📅 ${mensagem}`, 'success');
+            closeRenewModal();
             loadUsers();
         });
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Verificar expiração a cada minuto
+        setInterval(() => {
+            verificarExpiracaoDemoUsers();
+            if (sessionStorage.getItem('adminLogado') === 'true') {
+                loadDemoUsers();
+                loadUsers();
+            }
+        }, 60000);
 
         // Verificar se está logado
         window.addEventListener('load', function() {
+            ensureAdminUser();
+            verificarExpiracaoDemoUsers();
             if (sessionStorage.getItem('adminLogado') === 'true') {
                 document.getElementById('loginContainer').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 loadUsers();
+                loadDemoUsers();
+                loadHistory();
             }
         });
     </script>

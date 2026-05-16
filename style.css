@@ -557,3 +557,32 @@
     border-radius: 8px;
     cursor: pointer;
 }
+/* Estilos para relatórios e prestação de contas */
+.foto-item, .comprovante-item {
+    background: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.foto-item img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+.foto-info, .comprovante-info {
+    flex: 1;
+}
+.btn-print-relatorio {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}

@@ -300,7 +300,6 @@
         }
 
         .btn-view { background: #17a2b8; color: white; }
-        .btn-print { background: #6c757d; color: white; }
         .btn-edit { background: #ffc107; color: #333; }
         .btn-delete { background: #dc3545; color: white; }
 
@@ -689,12 +688,91 @@
             color: #667eea;
         }
 
-        .print-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
+        .episodio-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
             margin-bottom: 15px;
-            flex-wrap: wrap;
+        }
+        .episodio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .episodio-title {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .btn-remove-ep {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .personagem-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .personagem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .personagem-name {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .foto-item, .comprovante-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .foto-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .foto-info, .comprovante-info {
+            flex: 1;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 4000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .notification.error { background: #dc3545; }
+        .notification.info { background: #17a2b8; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
@@ -738,12 +816,13 @@
                 <span class="close-modal" onclick="closeProjectModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <aside class="modal-sidebar">
+                <aside class="modal-sidebar" id="mainSidebar">
                     <button class="tab active" onclick="switchTab('info')">📋 Informações</button>
                     <button class="tab" onclick="switchTab('especificacoes')">🎬 Especificações</button>
                     <button class="tab" onclick="switchTab('cronograma')">📅 Cronograma</button>
                     <button class="tab" onclick="switchTab('budget')">💰 Orçamento</button>
                     <button class="tab" onclick="switchTab('comunicacao')">📢 Plano de Divulgação</button>
+                    <button class="tab" onclick="switchTab('relatorios')">📊 Relatórios</button>
                 </aside>
                 <div class="modal-panel">
                     <!-- Aba INFORMAÇÕES -->
@@ -756,7 +835,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Categoria</label>
-                                <select id="projCategoria">
+                                <select id="projCategoria" onchange="updateSpecifications()">
                                     <option value="audiovisual">Audiovisual</option>
                                     <option value="teatro">Teatro</option>
                                     <option value="musica">Música</option>
@@ -807,10 +886,7 @@
 
                     <!-- Aba ESPECIFICAÇÕES -->
                     <div id="tabEspecificacoes" class="tab-content">
-                        <div class="form-section">
-                            <h3>Especificações do Projeto</h3>
-                            <div id="specificationsContainer"></div>
-                        </div>
+                        <div id="specificationsContainer"></div>
                     </div>
 
                     <!-- Aba CRONOGRAMA -->
@@ -832,11 +908,6 @@
                                     <input type="date" id="novaTarefaDataFim" placeholder="Data Fim">
                                     <button type="button" onclick="addTarefa()" class="btn-add-task">+</button>
                                 </div>
-                            </div>
-                            <div class="print-buttons">
-                                <button type="button" onclick="imprimirCronograma()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
-                                    🖨️ Imprimir Cronograma
-                                </button>
                             </div>
                             <div class="cronograma-total">
                                 <h4>📊 Resumo do Cronograma</h4>
@@ -863,12 +934,6 @@
                         <div class="form-section">
                             <h3>Planilha Orçamentária</h3>
                             <div id="budgetContainer"></div>
-                            
-                            <div class="print-buttons">
-                                <button type="button" onclick="imprimirOrcamento()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
-                                    🖨️ Imprimir Orçamento
-                                </button>
-                            </div>
                             
                             <div style="margin-top: 20px; border-top: 2px solid #667eea; padding-top: 20px;">
                                 <h4 style="color: #667eea; margin-bottom: 15px;">➕ Adicionar Item</h4>
@@ -931,16 +996,94 @@
                             <div id="itemsContainer"></div>
 
                             <div class="button-group">
-                                <button type="button" class="btn-add" onclick="adicionarLinhaDivulgacao()">
-                                    ➕ Adicionar Peça
-                                </button>
+                                <button type="button" class="btn-add" onclick="adicionarLinhaDivulgacao()">➕ Adicionar Peça</button>
                             </div>
-                            
-                            <div class="action-buttons">
-                                <button type="button" class="btn-save" onclick="saveCurrentProject()">
-                                    💾 Salvar Projeto
-                                </button>
+                        </div>
+                    </div>
+
+                    <!-- Aba RELATÓRIOS E PRESTAÇÃO DE CONTAS -->
+                    <div id="tabRelatorios" class="tab-content">
+                        <div class="form-section">
+                            <h3>📝 Relatório do Projeto</h3>
+                            <div class="form-group">
+                                <label>Título do Relatório</label>
+                                <input type="text" id="relatorioTitulo" placeholder="Ex: Relatório Mensal - Janeiro">
                             </div>
+                            <div class="form-group">
+                                <label>Relatório Descritivo</label>
+                                <textarea id="relatorioDescricao" rows="5" placeholder="Descreva o andamento do projeto, atividades realizadas, desafios, etc..."></textarea>
+                            </div>
+                            <div class="button-group">
+                                <button type="button" class="btn-add" onclick="imprimirRelatorio()">🖨️ Imprimir Relatório</button>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>📸 Fotos do Projeto</h3>
+                            <div id="fotosList"></div>
+                            <div class="add-row" style="grid-template-columns: 1fr auto;">
+                                <input type="file" id="fotoInput" accept="image/*" style="padding: 8px;">
+                                <button type="button" class="btn-add" onclick="adicionarFoto()">➕ Adicionar Foto</button>
+                            </div>
+                            <small style="color: #666;">As fotos são armazenadas em base64 no navegador</small>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>💰 Prestação de Contas</h3>
+                            <div style="margin-bottom: 15px;">
+                                <button type="button" class="btn-add" onclick="imprimirPrestacaoContas()" style="background: #17a2b8;">🖨️ Imprimir Prestação de Contas</button>
+                            </div>
+                            <table class="budget-table" id="prestacaoContasTable">
+                                <thead>
+                                    <tr><th>Item</th><th>Quantidade</th><th>Valor Unitário (R$)</th><th>Valor Total (R$)</th><th>Ações</th></tr>
+                                </thead>
+                                <tbody id="prestacaoContasBody"></tbody>
+                                <tfoot>
+                                    <tr style="background: #f8f9fa; font-weight: bold;">
+                                        <td colspan="3" style="text-align: right;">TOTAL GERAL:</td>
+                                        <td id="prestacaoTotalGeral">R$ 0,00</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <div class="add-row" style="grid-template-columns: 2fr 1fr 1fr 1fr auto;">
+                                <input type="text" id="prestacaoItem" placeholder="Descrição do item">
+                                <input type="number" id="prestacaoQuantidade" placeholder="Quantidade" value="1" min="1">
+                                <input type="number" id="prestacaoValorUnit" placeholder="Valor unitário" step="0.01">
+                                <input type="text" id="prestacaoTotalItem" placeholder="Valor total" readonly style="background:#f0f0f0;">
+                                <button type="button" class="btn-add-task" onclick="adicionarItemPrestacao()">+</button>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>📎 Comprovantes (Fotos/Arquivos)</h3>
+                            <div id="comprovantesList"></div>
+                            <div class="add-row" style="grid-template-columns: 1fr 1fr auto;">
+                                <input type="file" id="comprovanteInput" accept="image/*,application/pdf" style="padding: 8px;">
+                                <input type="text" id="comprovanteDesc" placeholder="Descrição do comprovante" style="padding: 8px;">
+                                <button type="button" class="btn-add" onclick="adicionarComprovante()">➕ Anexar Comprovante</button>
+                            </div>
+                            <div class="button-group">
+                                <button type="button" class="btn-add" onclick="imprimirComprovantes()" style="background: #17a2b8;">🖨️ Imprimir Comprovantes</button>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>📄 Relatórios Anexados</h3>
+                            <div id="anexosList"></div>
+                            <div class="add-row" style="grid-template-columns: 1fr 1fr auto;">
+                                <input type="text" id="anexoTitulo" placeholder="Título do anexo">
+                                <input type="file" id="anexoInput" accept=".pdf,.doc,.docx,.txt">
+                                <button type="button" class="btn-add" onclick="adicionarAnexo()">➕ Anexar Relatório</button>
+                            </div>
+                            <table class="budget-table" id="anexosTable" style="margin-top: 15px;">
+                                <thead><tr><th>Título</th><th>Arquivo</th><th>Data</th><th>Ações</th></tr></thead>
+                                <tbody id="anexosTableBody"></tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button type="button" class="btn-save" onclick="saveCurrentProject()">💾 Salvar Projeto</button>
                         </div>
                     </div>
                 </div>
@@ -952,6 +1095,7 @@
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script>
         // ========== VARIÁVEIS GLOBAIS ==========
         let currentProjectId = null;
@@ -959,6 +1103,13 @@
         
         let tarefasData = { pre: [], prod: [], pos: [] };
         let budgetItems = [];
+        let prestacaoContas = [];
+        let fotosProjeto = [];
+        let comprovantes = [];
+        let anexosRelatorios = [];
+
+        let episodios = [];
+        let personagens = [];
         
         const opcoesPecas = [
             "Redes Sociais", "Anúncios Google ADS", "Audiovisual", "Cartazes",
@@ -979,6 +1130,15 @@
         
         const formatosAudiovisual = ['Série', 'Longa-metragem', 'Curta-metragem', 'Novela', 'Reality Show', 'Documentário', 'Minissérie', 'Programa de TV', 'Videoclipe', 'Animação', 'Propaganda', 'Conteúdo para Web'];
         
+        // ========== FUNÇÃO DE NOTIFICAÇÃO ==========
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+        
         // ========== FUNÇÕES DE CALENDÁRIO ==========
         let currentDate = new Date();
 
@@ -995,7 +1155,7 @@
             const startDay = firstDay.getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            let projects = auth.getUserProjects();
             
             let todasTarefasPorDia = [];
             projects.forEach(project => {
@@ -1013,6 +1173,7 @@
                                     const dia = String(currentDateLoop.getDate()).padStart(2, '0');
                                     const dataStr = `${ano}-${mes}-${dia}`;
                                     const uniqueId = `${project.id}_${tarefa.nome.replace(/\s/g, '_')}_${dataStr}`;
+                                    
                                     let statusDia = tarefa.status;
                                     if (tarefa.statusPorDia && tarefa.statusPorDia[dataStr]) {
                                         statusDia = tarefa.statusPorDia[dataStr];
@@ -1038,38 +1199,13 @@
                 }
             });
             
-            projects.forEach(project => {
-                if (project.cronograma) {
-                    Object.values(project.cronograma).forEach(faseTarefas => {
-                        faseTarefas.forEach(tarefa => {
-                            if (tarefa.dataInicio && tarefa.dataFim && !tarefa.statusPorDia) {
-                                tarefa.statusPorDia = {};
-                                const startDate = new Date(tarefa.dataInicio);
-                                const endDate = new Date(tarefa.dataFim);
-                                const currentDateLoop = new Date(startDate);
-                                
-                                while (currentDateLoop <= endDate) {
-                                    const ano = currentDateLoop.getFullYear();
-                                    const mes = String(currentDateLoop.getMonth() + 1).padStart(2, '0');
-                                    const dia = String(currentDateLoop.getDate()).padStart(2, '0');
-                                    const dataStr = `${ano}-${mes}-${dia}`;
-                                    tarefa.statusPorDia[dataStr] = tarefa.status || 'pending';
-                                    currentDateLoop.setDate(currentDateLoop.getDate() + 1);
-                                }
-                            }
-                        });
-                    });
-                }
-            });
-            
-            localStorage.setItem('cultureProjects', JSON.stringify(projects));
-            
             let gridHtml = '';
             for (let i = 0; i < startDay; i++) gridHtml += '<div class="calendar-day empty"></div>';
             
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const currentDateObj = new Date(year, month, day);
+                
                 const tarefasNestaData = todasTarefasPorDia.filter(t => t.data === dateStr);
                 const dayProjects = projects.filter(p => p.dataInicio === dateStr || p.dataTermino === dateStr);
                 
@@ -1079,8 +1215,7 @@
                 tarefasNestaData.forEach(t => {
                     const dataFimTarefa = new Date(t.dataFim);
                     const diasRestantes = Math.ceil((dataFimTarefa - currentDateObj) / (1000 * 60 * 60 * 24));
-                    const isUrgent = t.status !== 'completed' && diasRestantes <= 6 && diasRestantes >= 0;
-                    const isOverdue = t.status !== 'completed' && diasRestantes < 0;
+                    const isUrgent = t.status !== 'completed' && diasRestantes <= 2 && diasRestantes >= 0;
                     
                     let statusClass = '';
                     let statusIcon = '';
@@ -1088,7 +1223,7 @@
                     if (t.status === 'completed') {
                         statusClass = 'completed';
                         statusIcon = '✅';
-                    } else if (isUrgent || isOverdue) {
+                    } else if (isUrgent) {
                         statusClass = 'urgent';
                         statusIcon = '🔴';
                     } else {
@@ -1112,8 +1247,8 @@
             
             const calendarGrid = document.getElementById('calendarGrid');
             if (calendarGrid) calendarGrid.innerHTML = gridHtml;
-        }  
-       
+        }
+
         function previousMonth() { 
             currentDate.setMonth(currentDate.getMonth() - 1); 
             renderCalendar(); 
@@ -1122,337 +1257,6 @@
         function nextMonth() { 
             currentDate.setMonth(currentDate.getMonth() + 1); 
             renderCalendar(); 
-        }
-        
-        // ========== FUNÇÕES DE IMPRESSÃO ==========
-        
-        // Função universal que abre a janela de impressão
-        function abrirJanelaImpressao(conteudoHtml, titulo) {
-            const win = window.open('', '_blank');
-            
-            win.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>${titulo}</title>
-                    <style>
-                        @page {
-                            size: auto;
-                            margin: 15mm;
-                        }
-                        * {
-                            margin: 0;
-                            padding: 0;
-                            box-sizing: border-box;
-                        }
-                        body {
-                            font-family: 'Segoe UI', Arial, sans-serif;
-                            margin: 0;
-                            padding: 20px;
-                            background: white;
-                        }
-                        .print-header {
-                            text-align: center;
-                            margin-bottom: 30px;
-                            border-bottom: 2px solid #667eea;
-                            padding-bottom: 15px;
-                        }
-                        .print-header h1 {
-                            color: #667eea;
-                            margin: 0;
-                            font-size: 24px;
-                        }
-                        .print-header p {
-                            color: #666;
-                            margin-top: 5px;
-                        }
-                        .print-section {
-                            margin-bottom: 25px;
-                            page-break-inside: avoid;
-                        }
-                        .print-section h2 {
-                            color: #667eea;
-                            border-left: 4px solid #667eea;
-                            padding-left: 12px;
-                            margin-bottom: 15px;
-                            font-size: 18px;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin: 15px 0;
-                        }
-                        th, td {
-                            border: 1px solid #ddd;
-                            padding: 10px;
-                            text-align: left;
-                        }
-                        th {
-                            background: #f5f5f5;
-                            font-weight: bold;
-                        }
-                        .print-footer {
-                            text-align: center;
-                            margin-top: 40px;
-                            padding-top: 20px;
-                            border-top: 1px solid #ddd;
-                            color: #999;
-                            font-size: 12px;
-                        }
-                        .budget-total {
-                            margin-top: 20px;
-                            padding: 15px;
-                            background: #f0f2f5;
-                            border-radius: 12px;
-                            text-align: center;
-                        }
-                        .progress-bar {
-                            width: 100%;
-                            background: #ddd;
-                            border-radius: 10px;
-                            overflow: hidden;
-                            margin-top: 10px;
-                        }
-                        .progress-fill {
-                            height: 10px;
-                            background: #28a745;
-                        }
-                        @media print {
-                            body {
-                                padding: 0;
-                                margin: 0;
-                            }
-                            .no-print {
-                                display: none;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${conteudoHtml}
-                    <div class="print-footer">
-                        Documento gerado pelo Sistema de Gestão de Projetos em ${new Date().toLocaleString('pt-BR')}
-                    </div>
-                    <div class="no-print" style="text-align: center; margin-top: 30px; padding: 20px;">
-                        <button onclick="window.print()" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; margin-right: 10px;">
-                            🖨️ Imprimir
-                        </button>
-                        <button onclick="window.close()" style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px;">
-                            ❌ Fechar
-                        </button>
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                            }, 500);
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `);
-            win.document.close();
-        }
-        
-        // Função para imprimir o projeto completo
-        function printProject(projectId) {
-            const projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
-            const project = projects.find(p => p.id == projectId);
-            if (!project) return;
-            
-            let cronogramaHtml = '';
-            const fases = [
-                { id: 'pre', nome: '📋 Pré-Produção' },
-                { id: 'prod', nome: '🎬 Produção' },
-                { id: 'pos', nome: '✂️ Pós-Produção' }
-            ];
-            
-            const cronograma = project.cronograma || { pre: [], prod: [], pos: [] };
-            let totalTarefas = 0;
-            let tarefasConcluidas = 0;
-            
-            fases.forEach(fase => {
-                const tarefas = cronograma[fase.id] || [];
-                if (tarefas.length > 0) {
-                    cronogramaHtml += `<div class="print-section">
-                        <h2>${fase.nome}</h2>
-                        <table>
-                            <thead><tr><th>Tarefa</th><th>Responsável</th><th>Data Início</th><th>Data Fim</th><th>Status</th></tr></thead>
-                            <tbody>`;
-                    tarefas.forEach(tarefa => {
-                        totalTarefas++;
-                        if (tarefa.status === 'completed') tarefasConcluidas++;
-                        const statusText = tarefa.status === 'completed' ? '✅ Concluída' : '⏳ Pendente';
-                        cronogramaHtml += `<tr>
-                            <td><strong>${escapeHtml(tarefa.nome)}</strong></td>
-                            <td>${escapeHtml(tarefa.responsavel || '-')}</td>
-                            <td>${tarefa.dataInicio || '—'}</td>
-                            <td>${tarefa.dataFim || '—'}</td>
-                            <td>${statusText}</td>
-                        </tr>`;
-                    });
-                    cronogramaHtml += `</tbody></table></div>`;
-                } else {
-                    cronogramaHtml += `<div class="print-section"><h2>${fase.nome}</h2><p style="color:#999;">Nenhuma tarefa nesta fase</p></div>`;
-                }
-            });
-            
-            const percentual = totalTarefas > 0 ? Math.round((tarefasConcluidas / totalTarefas) * 100) : 0;
-            cronogramaHtml += `<div class="print-section">
-                <p><strong>✅ Tarefas Concluídas:</strong> ${tarefasConcluidas} / ${totalTarefas}</p>
-                <p><strong>📊 Progresso:</strong> ${percentual}%</p>
-                <div class="progress-bar"><div class="progress-fill" style="width: ${percentual}%;"></div></div>
-            </div>`;
-            
-            const conteudo = `
-                <div class="print-header">
-                    <h1>📄 ${escapeHtml(project.nome)}</h1>
-                    <p>Categoria: ${project.categoria} | Período: ${project.dataInicio || '—'} até ${project.dataTermino || '—'}</p>
-                </div>
-                <div class="print-section">
-                    <h2>📋 Informações do Projeto</h2>
-                    <p><strong>Objetivo:</strong> ${escapeHtml(project.objetivo || 'N/A')}</p>
-                    <p><strong>Sinopse:</strong> ${escapeHtml(project.sinopse || 'N/A')}</p>
-                    <p><strong>Público Alvo:</strong> ${escapeHtml(project.publico || 'N/A')}</p>
-                    <p><strong>Justificativa:</strong> ${escapeHtml(project.justificativa || 'N/A')}</p>
-                </div>
-                <div class="print-section">
-                    <h2>📢 Plano de Divulgação</h2>
-                    <p><strong>Estratégias:</strong> ${escapeHtml(project.estrategias || 'N/A')}</p>
-                    <p><strong>Ações Promocionais:</strong> ${escapeHtml(project.acoes || 'N/A')}</p>
-                    <p><strong>Peças de Divulgação:</strong> ${escapeHtml(project.pecasDivulgacao ? project.pecasDivulgacao.map(p => p.peca).join(', ') : 'N/A')}</p>
-                </div>
-                <div class="print-section">
-                    <h2>📅 Cronograma</h2>
-                    ${cronogramaHtml}
-                </div>
-            `;
-            
-            abrirJanelaImpressao(conteudo, project.nome);
-        }
-        
-        // Função para imprimir apenas o orçamento
-        function imprimirOrcamento() {
-            const projetoNome = document.getElementById('projNome')?.value || 'Projeto sem nome';
-            
-            if (budgetItems.length === 0) {
-                alert('Nenhum item no orçamento para imprimir.');
-                return;
-            }
-            
-            const categoriasOrdenadas = [
-                "1. Profissionais da área", "2. Prestadores de serviços", "3. Equipamentos, materiais, estruturas",
-                "4. Logística", "5. Divulgação, mídia e comunicação", "6. Ações de acessibilidade",
-                "7. Custo Administrativo", "8. Taxas e serviços"
-            ];
-            
-            let tabelaHtml = '';
-            let totalGeral = 0;
-            
-            categoriasOrdenadas.forEach(cat => {
-                const itensCat = budgetItems.filter(item => item.categoria === cat);
-                if (itensCat.length > 0) {
-                    let subtotal = 0;
-                    tabelaHtml += `<div class="print-section">
-                        <h2>${cat}</h2>
-                        <table>
-                            <thead><tr><th>Nº</th><th>Descrição</th><th>Quantidade</th><th>Unidade</th><th>Qtd Unid.</th><th>Valor Unit.</th><th>Valor Total</th></tr></thead>
-                            <tbody>`;
-                    
-                    itensCat.forEach(item => {
-                        subtotal += item.valorTotal;
-                        tabelaHtml += `<tr>
-                            <td>${escapeHtml(item.numero)}</td>
-                            <td>${escapeHtml(item.descricao)}</td>
-                            <td>${item.quantidade}</td>
-                            <td>${escapeHtml(item.unidade)}</td>
-                            <td>${item.qtdUnidade}</td>
-                            <td>R$ ${formatarMoedaBrasileira(item.valorUnitario)}</td>
-                            <td><strong>R$ ${formatarMoedaBrasileira(item.valorTotal)}</strong></td>
-                        </tr>`;
-                    });
-                    
-                    tabelaHtml += `<tr style="background: #e8f5e9;">
-                        <td colspan="6" style="text-align: right;"><strong>Subtotal:</strong></td>
-                        <td><strong>R$ ${formatarMoedaBrasileira(subtotal)}</strong></td>
-                    </tr>`;
-                    tabelaHtml += `</tbody></table></div>`;
-                    totalGeral += subtotal;
-                }
-            });
-            
-            const conteudo = `
-                <div class="print-header">
-                    <h1>📊 PLANILHA ORÇAMENTÁRIA</h1>
-                    <p>${escapeHtml(projetoNome)}</p>
-                </div>
-                ${tabelaHtml}
-                <div class="budget-total">
-                    <h3>💰 TOTAL GERAL DO PROJETO</h3>
-                    <p style="font-size: 24px; color: #667eea; font-weight: bold;">R$ ${formatarMoedaBrasileira(totalGeral)}</p>
-                </div>
-            `;
-            
-            abrirJanelaImpressao(conteudo, `Orçamento - ${projetoNome}`);
-        }
-        
-        // Função para imprimir apenas o cronograma
-        function imprimirCronograma() {
-            const projetoNome = document.getElementById('projNome')?.value || 'Projeto sem nome';
-            const fases = [
-                { id: 'pre', nome: '📋 Pré-Produção' },
-                { id: 'prod', nome: '🎬 Produção' },
-                { id: 'pos', nome: '✂️ Pós-Produção' }
-            ];
-            
-            let cronogramaHtml = '';
-            let totalTarefas = 0;
-            let tarefasConcluidas = 0;
-            
-            fases.forEach(fase => {
-                const tarefas = tarefasData[fase.id] || [];
-                if (tarefas.length > 0) {
-                    cronogramaHtml += `<div class="print-section">
-                        <h2>${fase.nome}</h2>
-                        <table>
-                            <thead><tr><th>Tarefa</th><th>Responsável</th><th>Data Início</th><th>Data Fim</th><th>Status</th></tr></thead>
-                            <tbody>`;
-                    tarefas.forEach(tarefa => {
-                        totalTarefas++;
-                        if (tarefa.status === 'completed') tarefasConcluidas++;
-                        const statusText = tarefa.status === 'completed' ? '✅ Concluída' : '⏳ Pendente';
-                        cronogramaHtml += `<tr>
-                            <td><strong>${escapeHtml(tarefa.nome)}</strong></td>
-                            <td>${escapeHtml(tarefa.responsavel || '-')}</td>
-                            <td>${tarefa.dataInicio || '—'}</td>
-                            <td>${tarefa.dataFim || '—'}</td>
-                            <td>${statusText}</td>
-                        </tr>`;
-                    });
-                    cronogramaHtml += `</tbody></table></div>`;
-                } else {
-                    cronogramaHtml += `<div class="print-section"><h2>${fase.nome}</h2><p style="color:#999;">Nenhuma tarefa cadastrada nesta fase.</p></div>`;
-                }
-            });
-            
-            const percentual = totalTarefas > 0 ? Math.round((tarefasConcluidas / totalTarefas) * 100) : 0;
-            
-            cronogramaHtml += `<div class="print-section">
-                <p><strong>✅ Tarefas Concluídas:</strong> ${tarefasConcluidas} / ${totalTarefas}</p>
-                <p><strong>📊 Progresso:</strong> ${percentual}%</p>
-                <div class="progress-bar"><div class="progress-fill" style="width: ${percentual}%;"></div></div>
-            </div>`;
-            
-            const conteudo = `
-                <div class="print-header">
-                    <h1>📅 CRONOGRAMA DO PROJETO</h1>
-                    <p>${escapeHtml(projetoNome)}</p>
-                </div>
-                ${cronogramaHtml}
-            `;
-            
-            abrirJanelaImpressao(conteudo, `Cronograma - ${projetoNome}`);
         }
         
         // ========== FUNÇÕES DE CRONOGRAMA ==========
@@ -1602,9 +1406,9 @@
         function loadCronogramaData(data) { 
             if (data) {
                 Object.keys(data).forEach(fase => {
-                    data[fase].forEach((tarefa, idx) => {
+                    data[fase].forEach((tarefa) => {
                         if (!tarefa.status) tarefa.status = 'pending';
-                        if (!tarefa.statusPorDia) {
+                        if (!tarefa.statusPorDia && tarefa.dataInicio && tarefa.dataFim) {
                             tarefa.statusPorDia = {};
                             const startDate = new Date(tarefa.dataInicio);
                             const endDate = new Date(tarefa.dataFim);
@@ -1711,7 +1515,7 @@
                             <tbody>`;
                     
                     let subtotal = 0;
-                    itensCat.forEach((item, idx) => {
+                    itensCat.forEach((item) => {
                         const idxGlobal = budgetItems.findIndex(i => i === item);
                         subtotal += item.valorTotal;
                         html += `<tr>
@@ -1817,73 +1621,248 @@
         }
         
         // ========== FUNÇÕES DE ESPECIFICAÇÕES ==========
+        function renderEpisodios() {
+            const container = document.getElementById('episodiosContainer');
+            if (!container) return;
+            
+            if (episodios.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">Nenhum episódio cadastrado. Clique em "Adicionar Episódio" para começar.</p>';
+                return;
+            }
+            
+            let html = '';
+            episodios.forEach((ep, idx) => {
+                html += `
+                    <div class="episodio-item">
+                        <div class="episodio-header">
+                            <div class="episodio-title">📺 Episódio ${ep.numero}: ${escapeHtml(ep.titulo)}</div>
+                            <button class="btn-remove-ep" onclick="removerEpisodio(${idx})">🗑️ Remover</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Resumo do Episódio</label>
+                            <textarea class="episodio-resumo" data-idx="${idx}" rows="2" placeholder="Resumo do episódio...">${escapeHtml(ep.resumo)}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Sinopse do Episódio</label>
+                            <textarea class="episodio-sinopse" data-idx="${idx}" rows="3" placeholder="Sinopse detalhada do episódio...">${escapeHtml(ep.sinopse)}</textarea>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.episodio-resumo').forEach(el => {
+                el.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    episodios[idx].resumo = this.value;
+                });
+            });
+            document.querySelectorAll('.episodio-sinopse').forEach(el => {
+                el.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    episodios[idx].sinopse = this.value;
+                });
+            });
+        }
+        
+        function adicionarEpisodio() {
+            const numero = episodios.length + 1;
+            episodios.push({
+                numero: numero,
+                titulo: `Episódio ${numero}`,
+                resumo: '',
+                sinopse: ''
+            });
+            renderEpisodios();
+        }
+        
+        function removerEpisodio(idx) {
+            episodios.splice(idx, 1);
+            episodios.forEach((ep, i) => {
+                ep.numero = i + 1;
+                ep.titulo = `Episódio ${i + 1}`;
+            });
+            renderEpisodios();
+        }
+        
+        function renderPersonagens() {
+            const container = document.getElementById('personagensContainer');
+            if (!container) return;
+            
+            if (personagens.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">Nenhum personagem cadastrado. Clique em "Adicionar Personagem" para começar.</p>';
+                return;
+            }
+            
+            let html = '';
+            personagens.forEach((pers, idx) => {
+                html += `
+                    <div class="personagem-item">
+                        <div class="personagem-header">
+                            <div class="personagem-name">🎭 ${escapeHtml(pers.nome)}</div>
+                            <button class="btn-remove-ep" onclick="removerPersonagem(${idx})">🗑️ Remover</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição / Perfil</label>
+                            <textarea class="personagem-descricao" data-idx="${idx}" rows="2" placeholder="Descrição do personagem...">${escapeHtml(pers.descricao)}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Perfil Externo (aparência, características físicas)</label>
+                            <textarea class="personagem-externo" data-idx="${idx}" rows="2" placeholder="Perfil externo...">${escapeHtml(pers.perfilExterno)}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Perfil Interno (psicologia, motivações, personalidade)</label>
+                            <textarea class="personagem-interno" data-idx="${idx}" rows="2" placeholder="Perfil interno...">${escapeHtml(pers.perfilInterno)}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Decupagem do Personagem</label>
+                            <textarea class="personagem-decupagem" data-idx="${idx}" rows="2" placeholder="Decupagem do personagem...">${escapeHtml(pers.decupagem)}</textarea>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.personagem-descricao').forEach(el => {
+                el.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    personagens[idx].descricao = this.value;
+                });
+            });
+            document.querySelectorAll('.personagem-externo').forEach(el => {
+                el.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    personagens[idx].perfilExterno = this.value;
+                });
+            });
+            document.querySelectorAll('.personagem-interno').forEach(el => {
+                el.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    personagens[idx].perfilInterno = this.value;
+                });
+            });
+            document.querySelectorAll('.personagem-decupagem').forEach(el => {
+                el.addEventListener('change', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    personagens[idx].decupagem = this.value;
+                });
+            });
+        }
+        
+        function adicionarPersonagem() {
+            personagens.push({
+                nome: `Personagem ${personagens.length + 1}`,
+                descricao: '',
+                perfilExterno: '',
+                perfilInterno: '',
+                decupagem: ''
+            });
+            renderPersonagens();
+        }
+        
+        function removerPersonagem(idx) {
+            personagens.splice(idx, 1);
+            renderPersonagens();
+        }
+        
         function updateSpecifications() {
             const categoria = document.getElementById('projCategoria')?.value;
             const container = document.getElementById('specificationsContainer');
             if (!container) return;
             
-            let html = `<div class="spec-group"><h4>🎭 Gênero / Estilo</h4>
-                <div class="spec-field">
-                    <label>Selecione o Gênero:</label>
-                    <select id="projGenero" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
-                        <option value="">Selecione um gênero...</option>
-                        ${generosPorCategoria[categoria]?.map(g => `<option value="${g}">${g}</option>`).join('') || '<option value="">Nenhum gênero disponível</option>'}
-                    </select>
-                </div>
-            </div>`;
-            
             if (categoria === 'audiovisual') {
-                html += `<div class="spec-group"><h4>🎬 Especificações Audiovisuais</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Formato:</label><select id="projFormato" style="width:100%; padding:10px;"><option value="">Selecione...</option>${formatosAudiovisual.map(f => `<option value="${f}">${f}</option>`).join('')}</select></div>
-                        <div class="spec-field"><label>Tom / Estilo:</label><input type="text" id="projTom" placeholder="Ex: Sombrio, Leve..." style="width:100%; padding:10px;"></div>
+                container.innerHTML = `
+                    <div class="spec-group">
+                        <h4>🎭 Gênero / Estilo</h4>
+                        <div class="spec-field">
+                            <label>Selecione o Gênero:</label>
+                            <select id="projGenero" style="width:100%; padding:10px;">
+                                <option value="">Selecione um gênero...</option>
+                                ${generosPorCategoria['audiovisual']?.map(g => `<option value="${g}">${g}</option>`).join('')}
+                            </select>
+                        </div>
                     </div>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Nº Episódios:</label><input type="number" id="projEpisodios" placeholder="Ex: 10" style="width:100%; padding:10px;"></div>
-                        <div class="spec-field"><label>Duração por Episódio (min):</label><input type="number" id="projDuracaoEp" placeholder="Ex: 45" style="width:100%; padding:10px;"></div>
+                    
+                    <div class="spec-group">
+                        <h4>📋 Dados Básicos</h4>
+                        <div class="spec-row">
+                            <div class="spec-field"><label>Formato:</label><select id="projFormato" style="width:100%; padding:10px;">${formatosAudiovisual.map(f => `<option value="${f}">${f}</option>`).join('')}</select></div>
+                            <div class="spec-field"><label>Título Bíblia:</label><input type="text" id="projTituloBiblia" placeholder="Título da Bíblia" style="width:100%; padding:10px;"></div>
+                        </div>
+                        <div class="spec-row">
+                            <div class="spec-field"><label>Nº Episódios/Temporada:</label><input type="number" id="projEpisodios" placeholder="Ex: 10" style="width:100%; padding:10px;"></div>
+                            <div class="spec-field"><label>Duração por Episódio (min):</label><input type="number" id="projDuracaoEp" placeholder="Ex: 45" style="width:100%; padding:10px;"></div>
+                        </div>
+                        <div class="spec-field"><label>Temporadas:</label><select id="projTemporadas" style="width:100%; padding:10px;">${[1,2,3,4,5].map(t => `<option value="${t}">${t}ª Temporada</option>`).join('')}</select></div>
                     </div>
-                    <div class="spec-field"><label>Temporadas:</label><select id="projTemporadas" style="width:100%; padding:10px;">${[1,2,3,4,5].map(t => `<option value="${t}">${t}ª Temporada</option>`).join('')}</select></div>
-                </div>`;
+                    
+                    <div class="spec-group">
+                        <h4>📝 Premissa e Logline</h4>
+                        <div class="spec-field"><label>Premissa:</label><textarea id="projPremissa" rows="3" placeholder="Descreva a premissa do projeto..." style="width:100%; padding:10px;"></textarea></div>
+                        <div class="spec-field"><label>Logline:</label><textarea id="projLogline" rows="2" placeholder="Logline..." style="width:100%; padding:10px;"></textarea></div>
+                    </div>
+                    
+                    <div class="spec-group"><h4>🎯 Arco do Protagonista</h4><textarea id="projArcoProtagonista" rows="3" style="width:100%; padding:10px;"></textarea></div>
+                    <div class="spec-group"><h4>💪 Pontos Fortes da Proposta</h4><textarea id="projPontosFortes" rows="3" style="width:100%; padding:10px;"></textarea></div>
+                    <div class="spec-group"><h4>🎨 Abordagem Estética</h4><textarea id="projAbordagemEstetica" rows="3" style="width:100%; padding:10px;"></textarea></div>
+                    <div class="spec-group"><h4>📚 Referências Narrativas</h4><textarea id="projReferenciasNarrativa" rows="3" style="width:100%; padding:10px;"></textarea></div>
+                    <div class="spec-group"><h4>🎬 Referências Estéticas</h4><textarea id="projReferenciasEsteticas" rows="3" style="width:100%; padding:10px;"></textarea></div>
+                    <div class="spec-group"><h4>💡 Conceito</h4><textarea id="projConceito" rows="3" style="width:100%; padding:10px;"></textarea></div>
+                    
+                    <div class="spec-group"><h4>📺 Episódios</h4><div id="episodiosContainer"></div><div style="margin-top:10px;"><button type="button" class="btn-add" onclick="adicionarEpisodio()">➕ Adicionar Episódio</button></div></div>
+                    <div class="spec-group"><h4>🎭 Personagens</h4><div id="personagensContainer"></div><div style="margin-top:10px;"><button type="button" class="btn-add" onclick="adicionarPersonagem()">➕ Adicionar Personagem</button></div></div>
+                    
+                    <div class="spec-group"><h4>⭐ Participações Especiais</h4><textarea id="projParticipacoes" rows="2" style="width:100%; padding:10px;"></textarea></div>
+                    <div class="spec-group"><h4>📍 Locação Prevista</h4><textarea id="projLocacoes" rows="2" style="width:100%; padding:10px;"></textarea></div>
+                `;
+                renderEpisodios();
+                renderPersonagens();
+            } else if (categoria === 'teatro') {
+                container.innerHTML = `<div class="spec-group"><h4>🎭 Gênero</h4><select id="projGenero" style="width:100%; padding:10px;">${generosPorCategoria['teatro']?.map(g => `<option value="${g}">${g}</option>`).join('')}</select></div>
+                <div class="spec-group"><h4>Especificações Teatrais</h4><div class="spec-row"><div class="spec-field"><label>Tipo:</label><select id="projTipoTeatro" style="width:100%; padding:10px;"><option value="profissional">Profissional</option><option value="amador">Amador</option><option value="infantil">Infantil</option><option value="rua">Teatro de Rua</option></select></div>
+                <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoTeatro" style="width:100%; padding:10px;"></div></div>
+                <div class="spec-field"><label>Nº Atores:</label><input type="number" id="projNumAtores" style="width:100%; padding:10px;"></div></div>`;
+            } else if (categoria === 'musica') {
+                container.innerHTML = `<div class="spec-group"><h4>🎵 Gênero</h4><select id="projGenero" style="width:100%; padding:10px;">${generosPorCategoria['musica']?.map(g => `<option value="${g}">${g}</option>`).join('')}</select></div>
+                <div class="spec-group"><h4>Especificações Musicais</h4><div class="spec-row"><div class="spec-field"><label>Tipo:</label><select id="projTipoMusica" style="width:100%; padding:10px;"><option value="show">Show ao vivo</option><option value="festival">Festival</option><option value="grabacao">Gravação</option><option value="turnê">Turnê</option></select></div>
+                <div class="spec-field"><label>Nº Músicas:</label><input type="number" id="projNumMusicas" style="width:100%; padding:10px;"></div></div>
+                <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoShow" style="width:100%; padding:10px;"></div></div>`;
+            } else if (categoria === 'circo') {
+                container.innerHTML = `<div class="spec-group"><h4>🎪 Gênero</h4><select id="projGenero" style="width:100%; padding:10px;">${generosPorCategoria['circo']?.map(g => `<option value="${g}">${g}</option>`).join('')}</select></div>
+                <div class="spec-group"><h4>Especificações Circenses</h4><div class="spec-row"><div class="spec-field"><label>Modalidade:</label><select id="projModalidadeCirco" style="width:100%; padding:10px;"><option value="palhaco">Palhaçaria</option><option value="acrobata">Acrobacia</option><option value="malabarista">Malabarismo</option><option value="magico">Mágica</option><option value="trapezio">Trapézio</option></select></div>
+                <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoCirco" style="width:100%; padding:10px;"></div></div>
+                <div class="spec-field"><label>Nº Artistas:</label><input type="number" id="projNumArtistas" style="width:100%; padding:10px;"></div></div>`;
+            } else {
+                container.innerHTML = `<div class="spec-group"><h4>🎭 Gênero / Estilo</h4><select id="projGenero" style="width:100%; padding:10px;">${generosPorCategoria[categoria]?.map(g => `<option value="${g}">${g}</option>`).join('') || '<option value="">Nenhum gênero disponível</option>'}</select></div>`;
             }
-            if (categoria === 'teatro') {
-                html += `<div class="spec-group"><h4>🎭 Especificações Teatrais</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Tipo:</label><select id="projTipoTeatro" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="profissional">Profissional</option><option value="amador">Amador</option><option value="infantil">Infantil</option><option value="rua">Teatro de Rua</option></select></div>
-                        <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoTeatro" placeholder="Ex: 90" style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-field"><label>Nº Atores:</label><input type="number" id="projNumAtores" placeholder="Ex: 5" style="width:100%; padding:10px;"></div>
-                </div>`;
-            }
-            if (categoria === 'musica') {
-                html += `<div class="spec-group"><h4>🎵 Especificações Musicais</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Tipo:</label><select id="projTipoMusica" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="show">Show ao vivo</option><option value="festival">Festival</option><option value="grabacao">Gravação</option><option value="turnê">Turnê</option></select></div>
-                        <div class="spec-field"><label>Nº Músicas:</label><input type="number" id="projNumMusicas" placeholder="Ex: 15" style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoShow" placeholder="Ex: 120" style="width:100%; padding:10px;"></div>
-                </div>`;
-            }
-            if (categoria === 'circo') {
-                html += `<div class="spec-group"><h4>🎪 Especificações Circenses</h4>
-                    <div class="spec-row">
-                        <div class="spec-field"><label>Modalidade:</label><select id="projModalidadeCirco" style="width:100%; padding:10px;"><option value="">Selecione...</option><option value="palhaco">Palhaçaria</option><option value="acrobata">Acrobacia</option><option value="malabarista">Malabarismo</option><option value="magico">Mágica</option><option value="trapezio">Trapézio</option></select></div>
-                        <div class="spec-field"><label>Duração (min):</label><input type="number" id="projDuracaoCirco" placeholder="Ex: 60" style="width:100%; padding:10px;"></div>
-                    </div>
-                    <div class="spec-field"><label>Nº Artistas:</label><input type="number" id="projNumArtistas" placeholder="Ex: 8" style="width:100%; padding:10px;"></div>
-                </div>`;
-            }
-            container.innerHTML = html;
         }
         
         function loadSpecificationsData(project) {
             if (!project?.especificacoes) return;
             const specs = project.especificacoes;
+            
+            episodios = specs.episodios || [];
+            personagens = specs.personagens || [];
+            renderEpisodios();
+            renderPersonagens();
+            
             if (document.getElementById('projGenero') && specs.genero) document.getElementById('projGenero').value = specs.genero;
             if (specs.formato && document.getElementById('projFormato')) document.getElementById('projFormato').value = specs.formato;
-            if (specs.tom && document.getElementById('projTom')) document.getElementById('projTom').value = specs.tom;
-            if (specs.episodios && document.getElementById('projEpisodios')) document.getElementById('projEpisodios').value = specs.episodios;
+            if (specs.tituloBiblia && document.getElementById('projTituloBiblia')) document.getElementById('projTituloBiblia').value = specs.tituloBiblia;
+            if (specs.episodiosNum && document.getElementById('projEpisodios')) document.getElementById('projEpisodios').value = specs.episodiosNum;
             if (specs.duracaoEp && document.getElementById('projDuracaoEp')) document.getElementById('projDuracaoEp').value = specs.duracaoEp;
             if (specs.temporadas && document.getElementById('projTemporadas')) document.getElementById('projTemporadas').value = specs.temporadas;
+            if (specs.premissa && document.getElementById('projPremissa')) document.getElementById('projPremissa').value = specs.premissa;
+            if (specs.logline && document.getElementById('projLogline')) document.getElementById('projLogline').value = specs.logline;
+            if (specs.arcoProtagonista && document.getElementById('projArcoProtagonista')) document.getElementById('projArcoProtagonista').value = specs.arcoProtagonista;
+            if (specs.pontosFortes && document.getElementById('projPontosFortes')) document.getElementById('projPontosFortes').value = specs.pontosFortes;
+            if (specs.abordagemEstetica && document.getElementById('projAbordagemEstetica')) document.getElementById('projAbordagemEstetica').value = specs.abordagemEstetica;
+            if (specs.referenciasNarrativa && document.getElementById('projReferenciasNarrativa')) document.getElementById('projReferenciasNarrativa').value = specs.referenciasNarrativa;
+            if (specs.referenciasEsteticas && document.getElementById('projReferenciasEsteticas')) document.getElementById('projReferenciasEsteticas').value = specs.referenciasEsteticas;
+            if (specs.conceito && document.getElementById('projConceito')) document.getElementById('projConceito').value = specs.conceito;
+            if (specs.participacoes && document.getElementById('projParticipacoes')) document.getElementById('projParticipacoes').value = specs.participacoes;
+            if (specs.locacoes && document.getElementById('projLocacoes')) document.getElementById('projLocacoes').value = specs.locacoes;
+            
             if (specs.tipoTeatro && document.getElementById('projTipoTeatro')) document.getElementById('projTipoTeatro').value = specs.tipoTeatro;
             if (specs.duracaoTeatro && document.getElementById('projDuracaoTeatro')) document.getElementById('projDuracaoTeatro').value = specs.duracaoTeatro;
             if (specs.numAtores && document.getElementById('projNumAtores')) document.getElementById('projNumAtores').value = specs.numAtores;
@@ -1898,12 +1877,25 @@
         function getSpecificationsData() {
             const categoria = document.getElementById('projCategoria')?.value;
             const especificacoes = { genero: document.getElementById('projGenero')?.value || '' };
+            
             if (categoria === 'audiovisual') {
                 especificacoes.formato = document.getElementById('projFormato')?.value || '';
-                especificacoes.tom = document.getElementById('projTom')?.value || '';
-                especificacoes.episodios = document.getElementById('projEpisodios')?.value || '';
+                especificacoes.tituloBiblia = document.getElementById('projTituloBiblia')?.value || '';
+                especificacoes.episodiosNum = document.getElementById('projEpisodios')?.value || '';
                 especificacoes.duracaoEp = document.getElementById('projDuracaoEp')?.value || '';
                 especificacoes.temporadas = document.getElementById('projTemporadas')?.value || '';
+                especificacoes.premissa = document.getElementById('projPremissa')?.value || '';
+                especificacoes.logline = document.getElementById('projLogline')?.value || '';
+                especificacoes.arcoProtagonista = document.getElementById('projArcoProtagonista')?.value || '';
+                especificacoes.pontosFortes = document.getElementById('projPontosFortes')?.value || '';
+                especificacoes.abordagemEstetica = document.getElementById('projAbordagemEstetica')?.value || '';
+                especificacoes.referenciasNarrativa = document.getElementById('projReferenciasNarrativa')?.value || '';
+                especificacoes.referenciasEsteticas = document.getElementById('projReferenciasEsteticas')?.value || '';
+                especificacoes.conceito = document.getElementById('projConceito')?.value || '';
+                especificacoes.episodios = episodios;
+                especificacoes.personagens = personagens;
+                especificacoes.participacoes = document.getElementById('projParticipacoes')?.value || '';
+                especificacoes.locacoes = document.getElementById('projLocacoes')?.value || '';
             }
             if (categoria === 'teatro') {
                 especificacoes.tipoTeatro = document.getElementById('projTipoTeatro')?.value || '';
@@ -1921,6 +1913,316 @@
                 especificacoes.numArtistas = document.getElementById('projNumArtistas')?.value || '';
             }
             return especificacoes;
+        }
+        
+        // ========== FUNÇÕES DE RELATÓRIOS ==========
+        function calcularTotalPrestacao() {
+            const quantidade = parseFloat(document.getElementById('prestacaoQuantidade')?.value) || 0;
+            const valorUnit = parseFloat(document.getElementById('prestacaoValorUnit')?.value) || 0;
+            const total = quantidade * valorUnit;
+            const totalField = document.getElementById('prestacaoTotalItem');
+            if (totalField) totalField.value = total.toFixed(2);
+        }
+        
+        function adicionarItemPrestacao() {
+            const item = document.getElementById('prestacaoItem')?.value.trim();
+            const quantidade = parseFloat(document.getElementById('prestacaoQuantidade')?.value) || 0;
+            const valorUnit = parseFloat(document.getElementById('prestacaoValorUnit')?.value) || 0;
+            
+            if (!item) { alert('Informe a descrição do item'); return; }
+            if (quantidade <= 0) { alert('Informe uma quantidade válida'); return; }
+            if (valorUnit <= 0) { alert('Informe um valor unitário válido'); return; }
+            
+            prestacaoContas.push({ item, quantidade, valorUnit, valorTotal: quantidade * valorUnit });
+            
+            document.getElementById('prestacaoItem').value = '';
+            document.getElementById('prestacaoQuantidade').value = '1';
+            document.getElementById('prestacaoValorUnit').value = '';
+            document.getElementById('prestacaoTotalItem').value = '';
+            renderPrestacaoContas();
+        }
+        
+        function renderPrestacaoContas() {
+            const tbody = document.getElementById('prestacaoContasBody');
+            if (!tbody) return;
+            let totalGeral = 0;
+            if (prestacaoContas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">Nenhum item cadastrado</td></tr>';
+                document.getElementById('prestacaoTotalGeral').textContent = 'R$ 0,00';
+                return;
+            }
+            tbody.innerHTML = prestacaoContas.map((item, idx) => {
+                totalGeral += item.valorTotal;
+                return `<tr><td>${escapeHtml(item.item)}</td><td>${item.quantidade}</td><td>R$ ${item.valorUnit.toFixed(2)}</td><td>R$ ${item.valorTotal.toFixed(2)}</td><td><button class="remove-tarefa" onclick="removerItemPrestacao(${idx})">🗑️</button></td></tr>`;
+            }).join('');
+            document.getElementById('prestacaoTotalGeral').textContent = `R$ ${totalGeral.toFixed(2)}`;
+        }
+        
+        function removerItemPrestacao(idx) { prestacaoContas.splice(idx, 1); renderPrestacaoContas(); }
+        
+        function adicionarFoto() {
+            const input = document.getElementById('fotoInput');
+            const file = input.files[0];
+            if (!file) { alert('Selecione uma foto'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                fotosProjeto.push({ id: Date.now(), data: e.target.result, nome: file.name, dataHora: new Date().toLocaleString('pt-BR') });
+                renderFotos();
+                input.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function renderFotos() {
+            const container = document.getElementById('fotosList');
+            if (!container) return;
+            if (fotosProjeto.length === 0) { container.innerHTML = '<p style="color: #999;">Nenhuma foto adicionada</p>'; return; }
+            container.innerHTML = fotosProjeto.map((foto, idx) => `<div class="foto-item"><img src="${foto.data}" alt="Foto"><div class="foto-info"><strong>${escapeHtml(foto.nome)}</strong><br><small>${foto.dataHora}</small></div><button class="remove-tarefa" onclick="removerFoto(${idx})">🗑️</button></div>`).join('');
+        }
+        
+        function removerFoto(idx) { fotosProjeto.splice(idx, 1); renderFotos(); }
+        
+        function adicionarComprovante() {
+            const input = document.getElementById('comprovanteInput');
+            const descricao = document.getElementById('comprovanteDesc')?.value.trim();
+            const file = input.files[0];
+            if (!file) { alert('Selecione um comprovante'); return; }
+            if (!descricao) { alert('Informe uma descrição'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                comprovantes.push({ id: Date.now(), nome: file.name, descricao: descricao, data: e.target.result, dataHora: new Date().toLocaleString('pt-BR') });
+                renderComprovantes();
+                input.value = '';
+                document.getElementById('comprovanteDesc').value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function renderComprovantes() {
+            const container = document.getElementById('comprovantesList');
+            if (!container) return;
+            if (comprovantes.length === 0) { container.innerHTML = '<p style="color: #999;">Nenhum comprovante anexado</p>'; return; }
+            container.innerHTML = comprovantes.map((comp, idx) => `<div class="comprovante-item"><div class="comprovante-info"><strong>${escapeHtml(comp.descricao)}</strong><br><small>${escapeHtml(comp.nome)} - ${comp.dataHora}</small></div><button class="remove-tarefa" onclick="removerComprovante(${idx})">🗑️</button></div>`).join('');
+        }
+        
+        function removerComprovante(idx) { comprovantes.splice(idx, 1); renderComprovantes(); }
+        
+        function adicionarAnexo() {
+            const titulo = document.getElementById('anexoTitulo')?.value.trim();
+            const input = document.getElementById('anexoInput');
+            const file = input.files[0];
+            if (!titulo) { alert('Informe um título'); return; }
+            if (!file) { alert('Selecione um arquivo'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                anexosRelatorios.push({ id: Date.now(), titulo: titulo, nome: file.name, data: e.target.result, dataHora: new Date().toLocaleString('pt-BR') });
+                renderAnexos();
+                document.getElementById('anexoTitulo').value = '';
+                input.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function renderAnexos() {
+            const tbody = document.getElementById('anexosTableBody');
+            if (!tbody) return;
+            if (anexosRelatorios.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999;">Nenhum anexo</td></tr>'; return; }
+            tbody.innerHTML = anexosRelatorios.map((anexo, idx) => `<tr><td>${escapeHtml(anexo.titulo)}</td><td>${escapeHtml(anexo.nome)}</td><td>${anexo.dataHora}</td><td><button class="remove-tarefa" onclick="removerAnexo(${idx})">🗑️</button></td></tr>`).join('');
+        }
+        
+        function removerAnexo(idx) { anexosRelatorios.splice(idx, 1); renderAnexos(); }
+        
+        // ========== FUNÇÕES DE IMPRESSÃO COMPLETAS ==========
+        function imprimirRelatorio() {
+            const projetoNome = document.getElementById('projNome')?.value || 'Projeto';
+            const titulo = document.getElementById('relatorioTitulo')?.value || 'Relatório do Projeto';
+            const descricao = document.getElementById('relatorioDescricao')?.value || 'Sem descrição';
+            
+            const win = window.open('', '_blank');
+            win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Relatório - ${escapeHtml(projetoNome)}</title><style>body{font-family:Arial;margin:40px;}h1{color:#667eea;}img{max-width:300px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ddd;padding:8px;}th{background:#f8f9fa;}</style></head><body><h1>${escapeHtml(titulo)}</h1><p><strong>Projeto:</strong> ${escapeHtml(projetoNome)}</p><p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p><hr><h3>Descrição</h3><p>${escapeHtml(descricao).replace(/\n/g,'<br>')}</p><h3>Fotos do Projeto (${fotosProjeto.length})</h3>${fotosProjeto.map(f=>`<div><img src="${f.data}"><br><small>${escapeHtml(f.nome)} - ${f.dataHora}</small></div>`).join('')||'<p>Nenhuma foto</p>'}<div style="margin-top:50px;text-align:center;">Documento gerado pelo Sistema de Gestão de Projetos</div><div style="text-align:center;margin-top:20px;"><button onclick="window.print()">🖨️ Imprimir</button> <button onclick="window.close()">❌ Fechar</button></div></body></html>`);
+            win.document.close();
+        }
+        
+        function imprimirPrestacaoContas() {
+            const projetoNome = document.getElementById('projNome')?.value || 'Projeto';
+            const total = prestacaoContas.reduce((s,i)=>s+i.valorTotal,0);
+            const win = window.open('', '_blank');
+            win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Prestação de Contas - ${escapeHtml(projetoNome)}</title><style>body{font-family:Arial;margin:40px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ddd;padding:8px;}th{background:#f8f9fa;}</style></head><body><h1>💰 Prestação de Contas</h1><p><strong>Projeto:</strong> ${escapeHtml(projetoNome)}</p><p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p><table><thead><tr><th>Item</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th></tr></thead><tbody>${prestacaoContas.map(i=>`<tr><td>${escapeHtml(i.item)}</td><td>${i.quantidade}</td><td>R$ ${i.valorUnit.toFixed(2)}</td><td>R$ ${i.valorTotal.toFixed(2)}</td></tr>`).join('')||'<tr><td colspan="4">Nenhum item</td></tr>'}</tbody><tfoot><tr style="background:#e8f5e9;font-weight:bold;"><td colspan="3">TOTAL:</td><td>R$ ${total.toFixed(2)}</td></tr></tfoot></table><h3>Comprovantes (${comprovantes.length})</h3>${comprovantes.map(c=>`<p><strong>${escapeHtml(c.descricao)}</strong> - ${escapeHtml(c.nome)} (${c.dataHora})</p>`).join('')||'<p>Nenhum comprovante</p>'}<div style="text-align:center;margin-top:30px;"><button onclick="window.print()">🖨️ Imprimir</button> <button onclick="window.close()">❌ Fechar</button></div></body></html>`);
+            win.document.close();
+        }
+        
+        function imprimirComprovantes() {
+            const projetoNome = document.getElementById('projNome')?.value || 'Projeto';
+            const win = window.open('', '_blank');
+            win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comprovantes - ${escapeHtml(projetoNome)}</title><style>body{font-family:Arial;margin:40px;}.comprovante{margin-bottom:20px;border:1px solid #ddd;padding:15px;}</style></head><body><h1>📎 Comprovantes</h1><p><strong>Projeto:</strong> ${escapeHtml(projetoNome)}</p><p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>${comprovantes.map(c=>`<div class="comprovante"><h3>${escapeHtml(c.descricao)}</h3><p>Arquivo: ${escapeHtml(c.nome)}</p><p>Adicionado em: ${c.dataHora}</p></div>`).join('')||'<p>Nenhum comprovante</p>'}<div style="text-align:center;margin-top:30px;"><button onclick="window.print()">🖨️ Imprimir</button> <button onclick="window.close()">❌ Fechar</button></div></body></html>`);
+            win.document.close();
+        }
+        
+        // IMPRESSÃO COMPLETA DO PROJETO - COM TODAS AS INFORMAÇÕES
+        function imprimirProjetoCompleto(project) {
+            const win = window.open('', '_blank');
+            let especificacoesHtml = '';
+            
+            // Especificações de acordo com a categoria
+            if (project.especificacoes) {
+                const specs = project.especificacoes;
+                especificacoesHtml = '<div class="section"><h2>🎬 Especificações do Projeto</h2>';
+                if (specs.genero) especificacoesHtml += `<p><strong>Gênero:</strong> ${escapeHtml(specs.genero)}</p>`;
+                if (specs.formato) especificacoesHtml += `<p><strong>Formato:</strong> ${escapeHtml(specs.formato)}</p>`;
+                if (specs.tituloBiblia) especificacoesHtml += `<p><strong>Título Bíblia:</strong> ${escapeHtml(specs.tituloBiblia)}</p>`;
+                if (specs.episodiosNum) especificacoesHtml += `<p><strong>Episódios:</strong> ${specs.episodiosNum}</p>`;
+                if (specs.duracaoEp) especificacoesHtml += `<p><strong>Duração por Episódio:</strong> ${specs.duracaoEp} min</p>`;
+                if (specs.temporadas) especificacoesHtml += `<p><strong>Temporadas:</strong> ${specs.temporadas}ª</p>`;
+                if (specs.premissa) especificacoesHtml += `<p><strong>Premissa:</strong> ${escapeHtml(specs.premissa)}</p>`;
+                if (specs.logline) especificacoesHtml += `<p><strong>Logline:</strong> ${escapeHtml(specs.logline)}</p>`;
+                if (specs.arcoProtagonista) especificacoesHtml += `<p><strong>Arco do Protagonista:</strong> ${escapeHtml(specs.arcoProtagonista)}</p>`;
+                if (specs.pontosFortes) especificacoesHtml += `<p><strong>Pontos Fortes:</strong> ${escapeHtml(specs.pontosFortes)}</p>`;
+                if (specs.abordagemEstetica) especificacoesHtml += `<p><strong>Abordagem Estética:</strong> ${escapeHtml(specs.abordagemEstetica)}</p>`;
+                if (specs.referenciasNarrativa) especificacoesHtml += `<p><strong>Referências Narrativas:</strong> ${escapeHtml(specs.referenciasNarrativa)}</p>`;
+                if (specs.referenciasEsteticas) especificacoesHtml += `<p><strong>Referências Estéticas:</strong> ${escapeHtml(specs.referenciasEsteticas)}</p>`;
+                if (specs.conceito) especificacoesHtml += `<p><strong>Conceito:</strong> ${escapeHtml(specs.conceito)}</p>`;
+                if (specs.participacoes) especificacoesHtml += `<p><strong>Participações Especiais:</strong> ${escapeHtml(specs.participacoes)}</p>`;
+                if (specs.locacoes) especificacoesHtml += `<p><strong>Locação Prevista:</strong> ${escapeHtml(specs.locacoes)}</p>`;
+                
+                // Personagens
+                if (specs.personagens && specs.personagens.length) {
+                    especificacoesHtml += '<h3>🎭 Personagens</h3>';
+                    specs.personagens.forEach(p => {
+                        especificacoesHtml += `<div style="margin-bottom:15px;border-left:3px solid #667eea;padding-left:10px;"><strong>${escapeHtml(p.nome)}</strong>`;
+                        if (p.descricao) especificacoesHtml += `<p><em>Descrição:</em> ${escapeHtml(p.descricao)}</p>`;
+                        if (p.perfilExterno) especificacoesHtml += `<p><em>Perfil Externo:</em> ${escapeHtml(p.perfilExterno)}</p>`;
+                        if (p.perfilInterno) especificacoesHtml += `<p><em>Perfil Interno:</em> ${escapeHtml(p.perfilInterno)}</p>`;
+                        if (p.decupagem) especificacoesHtml += `<p><em>Decupagem:</em> ${escapeHtml(p.decupagem)}</p>`;
+                        especificacoesHtml += `</div>`;
+                    });
+                }
+                
+                // Episódios
+                if (specs.episodios && specs.episodios.length) {
+                    especificacoesHtml += '<h3>📺 Episódios</h3>';
+                    specs.episodios.forEach(ep => {
+                        especificacoesHtml += `<div style="margin-bottom:15px;"><strong>Episódio ${ep.numero}:</strong> ${escapeHtml(ep.titulo)}`;
+                        if (ep.resumo) especificacoesHtml += `<br><em>Resumo:</em> ${escapeHtml(ep.resumo)}`;
+                        if (ep.sinopse) especificacoesHtml += `<br><em>Sinopse:</em> ${escapeHtml(ep.sinopse)}`;
+                        especificacoesHtml += `</div>`;
+                    });
+                }
+                especificacoesHtml += '</div>';
+            }
+            
+            // Cronograma
+            let cronogramaHtml = '<div class="section"><h2>📅 Cronograma</h2>';
+            if (project.cronograma) {
+                const fases = { pre: 'Pré-Produção', prod: 'Produção', pos: 'Pós-Produção' };
+                for (let fase in project.cronograma) {
+                    const tarefas = project.cronograma[fase];
+                    if (tarefas && tarefas.length) {
+                        cronogramaHtml += `<h3>${fases[fase] || fase}</h3>`;
+                        cronogramaHtml += '<table><thead><tr><th>Tarefa</th><th>Responsável</th><th>Data Início</th><th>Data Fim</th><th>Status</th></tr></thead><tbody>';
+                        tarefas.forEach(t => {
+                            cronogramaHtml += `<tr><td>${escapeHtml(t.nome)}</td><td>${escapeHtml(t.responsavel)}</td><td>${t.dataInicio || 'N/A'}</td><td>${t.dataFim || 'N/A'}</td><td>${t.status === 'completed' ? '✅ Concluída' : '⏳ Pendente'}</td></tr>`;
+                        });
+                        cronogramaHtml += '</tbody></table>';
+                    }
+                }
+            } else {
+                cronogramaHtml += '<p>Nenhum cronograma cadastrado</p>';
+            }
+            cronogramaHtml += '</div>';
+            
+            // Orçamento
+            let orcamentoTotal = 0;
+            let orcamentoHtml = '<div class="section"><h2>💰 Orçamento</h2>';
+            if (project.orcamento && project.orcamento.length) {
+                orcamentoHtml += '<table><thead><tr><th>Item</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th></tr></thead><tbody>';
+                project.orcamento.forEach(item => {
+                    const total = (item.quantidade || 0) * (item.valorUnitario || 0);
+                    orcamentoTotal += total;
+                    orcamentoHtml += `<tr><td>${escapeHtml(item.descricao)}</td><td>${item.quantidade}</td><td>R$ ${(item.valorUnitario || 0).toFixed(2)}</td><td>R$ ${total.toFixed(2)}</td></tr>`;
+                });
+                orcamentoHtml += `<tr style="background:#e8f5e9;font-weight:bold;"><td colspan="3">TOTAL</td><td>R$ ${orcamentoTotal.toFixed(2)}</td></tr>`;
+                orcamentoHtml += '</tbody></table>';
+            } else {
+                orcamentoHtml += '<p>Nenhum item orçamentário cadastrado</p>';
+            }
+            orcamentoHtml += '</div>';
+            
+            // Prestação de Contas
+            let prestacaoTotal = 0;
+            let prestacaoHtml = '<div class="section"><h2>💰 Prestação de Contas</h2>';
+            if (project.prestacaoContas && project.prestacaoContas.length) {
+                prestacaoHtml += '<table><thead><tr><th>Item</th><th>Quantidade</th><th>Valor Unitário</th><th>Valor Total</th></tr></thead><tbody>';
+                project.prestacaoContas.forEach(item => {
+                    prestacaoTotal += item.valorTotal;
+                    prestacaoHtml += `<tr><td>${escapeHtml(item.item)}</td><td>${item.quantidade}</td><td>R$ ${item.valorUnit.toFixed(2)}</td><td>R$ ${item.valorTotal.toFixed(2)}</td></tr>`;
+                });
+                prestacaoHtml += `<tr style="background:#e8f5e9;font-weight:bold;"><td colspan="3">TOTAL</td><td>R$ ${prestacaoTotal.toFixed(2)}</td></tr>`;
+                prestacaoHtml += '</tbody></table>';
+            } else {
+                prestacaoHtml += '<p>Nenhum item na prestação de contas</p>';
+            }
+            prestacaoHtml += '</div>';
+            
+            win.document.write(`<!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Relatório Completo - ${escapeHtml(project.nome)}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    h1 { color: #667eea; }
+                    h2 { color: #764ba2; border-bottom: 2px solid #764ba2; padding-bottom: 10px; margin-top: 30px; }
+                    h3 { color: #667eea; margin-top: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+                    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                    th { background: #f8f9fa; }
+                    .header { text-align: center; border-bottom: 3px solid #667eea; padding-bottom: 20px; margin-bottom: 30px; }
+                    .footer { text-align: center; margin-top: 50px; color: #999; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px; }
+                    .section { margin-bottom: 30px; }
+                    .total { font-weight: bold; background: #e8f5e9; }
+                    img { max-width: 200px; border-radius: 10px; margin: 10px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>📄 Relatório Completo do Projeto</h1>
+                    <h2>${escapeHtml(project.nome)}</h2>
+                    <p><strong>Categoria:</strong> ${project.categoria}</p>
+                    <p><strong>Período:</strong> ${project.dataInicio || 'N/A'} até ${project.dataTermino || 'N/A'}</p>
+                    <p><strong>Data de emissão:</strong> ${new Date().toLocaleString('pt-BR')}</p>
+                </div>
+                
+                <div class="section">
+                    <h2>📋 Informações do Projeto</h2>
+                    <p><strong>Objetivo:</strong> ${escapeHtml(project.objetivo || 'N/A')}</p>
+                    <p><strong>Sinopse / Resumo:</strong> ${escapeHtml(project.sinopse || 'N/A')}</p>
+                    <p><strong>Público Alvo:</strong> ${escapeHtml(project.publico || 'N/A')}</p>
+                    <p><strong>Justificativa:</strong> ${escapeHtml(project.justificativa || 'N/A')}</p>
+                    <p><strong>Como será realizado:</strong> ${escapeHtml(project.comoRealizado || 'N/A')}</p>
+                    <p><strong>Narrativa / Diferenciais:</strong> ${escapeHtml(project.narrativa || 'N/A')}</p>
+                </div>
+                
+                ${especificacoesHtml}
+                ${cronogramaHtml}
+                ${orcamentoHtml}
+                ${prestacaoHtml}
+                
+                <div class="section">
+                    <h2>📸 Fotos do Projeto</h2>
+                    ${(project.fotosProjeto || []).map(f => `<div style="display:inline-block;"><img src="${f.data}"><br><small>${escapeHtml(f.nome)}<br>${f.dataHora}</small></div>`).join('') || '<p>Nenhuma foto adicionada</p>'}
+                </div>
+                
+                <div class="footer">
+                    Documento gerado pelo Sistema de Gestão de Projetos Culturais<br>
+                    Gerado em ${new Date().toLocaleString('pt-BR')}
+                </div>
+                <div style="text-align:center; margin-top:30px;">
+                    <button onclick="window.print()">🖨️ Imprimir</button>
+                    <button onclick="window.close()">❌ Fechar</button>
+                </div>
+            </body>
+            </html>`);
+            win.document.close();
         }
         
         // ========== FUNÇÕES DE PROJETO ==========
@@ -1958,14 +2260,26 @@
             document.getElementById('projNarrativa').value = '';
             document.getElementById('planoEstrategias').value = '';
             document.getElementById('planoAcoes').value = '';
+            if(document.getElementById('relatorioTitulo')) document.getElementById('relatorioTitulo').value = '';
+            if(document.getElementById('relatorioDescricao')) document.getElementById('relatorioDescricao').value = '';
             loadDivulgacaoData(null);
             clearCronograma();
             clearBudget();
+            prestacaoContas = [];
+            fotosProjeto = [];
+            comprovantes = [];
+            anexosRelatorios = [];
+            episodios = [];
+            personagens = [];
+            renderPrestacaoContas();
+            renderFotos();
+            renderComprovantes();
+            renderAnexos();
             updateSpecifications();
         }
         
         function loadProjectData(projectId) {
-            const projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            let projects = auth.getUserProjects();
             const project = projects.find(p => p.id == projectId);
             if (!project) return;
             document.getElementById('projNome').value = project.nome || '';
@@ -1980,16 +2294,35 @@
             document.getElementById('projNarrativa').value = project.narrativa || '';
             document.getElementById('planoEstrategias').value = project.estrategias || '';
             document.getElementById('planoAcoes').value = project.acoes || '';
+            if(document.getElementById('relatorioTitulo')) document.getElementById('relatorioTitulo').value = project.relatorioTitulo || '';
+            if(document.getElementById('relatorioDescricao')) document.getElementById('relatorioDescricao').value = project.relatorioDescricao || '';
             loadDivulgacaoData(project.pecasDivulgacao || null);
             loadCronogramaData(project.cronograma || { pre: [], prod: [], pos: [] });
             loadBudgetData(project.orcamento || []);
-            setTimeout(() => { updateSpecifications(); loadSpecificationsData(project); }, 100);
+            prestacaoContas = project.prestacaoContas || [];
+            fotosProjeto = project.fotosProjeto || [];
+            comprovantes = project.comprovantes || [];
+            anexosRelatorios = project.anexosRelatorios || [];
+            renderPrestacaoContas();
+            renderFotos();
+            renderComprovantes();
+            renderAnexos();
+            setTimeout(() => { 
+                updateSpecifications(); 
+                loadSpecificationsData(project); 
+            }, 100);
         }
         
         function saveCurrentProject() {
+            const nome = document.getElementById('projNome').value.trim();
+            if (!nome) { 
+                showNotification('❌ Por favor, informe o nome do projeto', 'error');
+                return; 
+            }
+            
             const project = {
                 id: currentProjectId || Date.now(),
-                nome: document.getElementById('projNome').value,
+                nome: nome,
                 categoria: document.getElementById('projCategoria').value,
                 dataInicio: document.getElementById('projDataInicio').value,
                 dataTermino: document.getElementById('projDataTermino').value,
@@ -2002,19 +2335,28 @@
                 estrategias: document.getElementById('planoEstrategias').value,
                 acoes: document.getElementById('planoAcoes').value,
                 pecasDivulgacao: getDivulgacaoData(),
-                cronograma: getCronogramaData(),
-                orcamento: getBudgetData(),
-                especificacoes: getSpecificationsData()
+                cronograma: tarefasData,
+                orcamento: budgetItems,
+                especificacoes: getSpecificationsData(),
+                relatorioTitulo: document.getElementById('relatorioTitulo')?.value || '',
+                relatorioDescricao: document.getElementById('relatorioDescricao')?.value || '',
+                prestacaoContas: prestacaoContas,
+                fotosProjeto: fotosProjeto,
+                comprovantes: comprovantes,
+                anexosRelatorios: anexosRelatorios
             };
-            if (!project.nome.trim()) { alert('Por favor, informe o nome do projeto.'); return; }
-            let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            
+            let projects = auth.getUserProjects();
             if (currentProjectId) {
                 const index = projects.findIndex(p => p.id == currentProjectId);
                 if (index !== -1) projects[index] = project;
-            } else { projects.push(project); }
-            localStorage.setItem('cultureProjects', JSON.stringify(projects));
-            alert('Projeto salvo com sucesso!');
-            closeProjectModal();
+                showNotification(`✅ Projeto "${nome}" atualizado com sucesso!`, 'success');
+            } else { 
+                projects.push(project); 
+                showNotification(`✅ Projeto "${nome}" criado com sucesso!`, 'success');
+            }
+            auth.saveUserProjects(projects);
+            
             loadProjectsList();
             renderCalendar();
         }
@@ -2022,9 +2364,9 @@
         function loadProjectsList() {
             const projectsGrid = document.getElementById('projectsGrid');
             if (!projectsGrid) return;
-            const projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            const projects = auth.getUserProjects();
             if (projects.length === 0) { 
-                projectsGrid.innerHTML = '<div class="no-projects">Nenhum projeto cadastrado. Clique em "Criar Projeto" para começar.</div>'; 
+                projectsGrid.innerHTML = '<div class="no-projects">📭 Nenhum projeto cadastrado. Clique em "Criar Projeto" para começar.</div>'; 
                 return; 
             }
             projectsGrid.innerHTML = projects.map(project => `
@@ -2034,7 +2376,7 @@
                     <p class="project-dates">${project.dataInicio || '—'} até ${project.dataTermino || '—'}</p>
                     <div class="project-actions">
                         <button class="btn-view" onclick="viewProject(${project.id})">👁️ Visualizar</button>
-                        <button class="btn-print" onclick="printProject(${project.id})">🖨️ Imprimir</button>
+                        <button class="btn-print" onclick="imprimirProjetoCompleto(${JSON.stringify(project).replace(/"/g, '&quot;')})" style="background:#28a745;color:white;">🖨️ Imprimir Completo</button>
                         <button class="btn-edit" onclick="openProjectModal(${project.id})">✏️ Editar</button>
                         <button class="btn-delete" onclick="deleteProject(${project.id})">🗑️ Excluir</button>
                     </div>
@@ -2044,9 +2386,9 @@
         
         function deleteProject(projectId) {
             if (confirm('Tem certeza que deseja excluir este projeto?')) {
-                let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+                let projects = auth.getUserProjects();
                 projects = projects.filter(p => p.id != projectId);
-                localStorage.setItem('cultureProjects', JSON.stringify(projects));
+                auth.saveUserProjects(projects);
                 loadProjectsList();
                 renderCalendar();
             }
@@ -2058,55 +2400,28 @@
         }
         
         function viewProject(projectId) {
-            const projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            const projects = auth.getUserProjects();
             const project = projects.find(p => p.id == projectId);
             if (!project) return;
-            const viewModal = document.createElement('div');
-            viewModal.className = 'view-modal';
-            const categorias = { 'audiovisual': 'Audiovisual', 'teatro': 'Teatro', 'musica': 'Música', 'artes_visuais': 'Artes Visuais', 'alimentos': 'Alimentos', 'esportes': 'Esportes', 'educacao': 'Educação', 'circo': 'Circo' };
-            let specsHtml = '';
-            if (project.especificacoes) {
-                const specs = project.especificacoes;
-                specsHtml = '<div style="margin-bottom:20px;"><h3 style="color:#667eea;">🎬 Especificações</h3>';
-                if (specs.genero) specsHtml += `<p><strong>Gênero:</strong> ${escapeHtml(specs.genero)}</p>`;
-                if (specs.formato) specsHtml += `<p><strong>Formato:</strong> ${escapeHtml(specs.formato)}</p>`;
-                if (specs.tom) specsHtml += `<p><strong>Tom/Estilo:</strong> ${escapeHtml(specs.tom)}</p>`;
-                if (specs.episodios) specsHtml += `<p><strong>Episódios:</strong> ${specs.episodios}</p>`;
-                if (specs.duracaoEp) specsHtml += `<p><strong>Duração por Episódio:</strong> ${specs.duracaoEp} min</p>`;
-                if (specs.temporadas) specsHtml += `<p><strong>Temporadas:</strong> ${specs.temporadas}ª</p>`;
-                specsHtml += '</div>';
-            }
-            viewModal.innerHTML = `<div style="background:white; border-radius:15px; width:90%; max-width:800px; max-height:90%; overflow-y:auto; padding:25px; position:relative; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #667eea; padding-bottom:10px;">
-                    <h2 style="margin:0; color:#667eea;">📄 ${escapeHtml(project.nome)}</h2>
-                    <button onclick="this.closest('.view-modal').remove()" style="background:#dc3545; color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;">&times;</button>
-                </div>
-                <div style="margin-bottom:20px;"><span style="background:#667eea; color:white; padding:5px 12px; border-radius:20px;">${categorias[project.categoria] || project.categoria}</span>
-                <span style="margin-left:10px; color:#666;">📅 ${project.dataInicio || '—'} até ${project.dataTermino || '—'}</span></div>
-                ${specsHtml}
-                ${project.objetivo ? `<div style="margin-bottom:20px;"><h3 style="color:#667eea;">🎯 Objetivo</h3><p>${escapeHtml(project.objetivo)}</p></div>` : ''}
-                ${project.sinopse ? `<div style="margin-bottom:20px;"><h3 style="color:#667eea;">📖 Sinopse</h3><p>${escapeHtml(project.sinopse)}</p></div>` : ''}
-                <div style="margin-top:30px; text-align:center; color:#999;">Documento gerado pelo Sistema de Gestão de Projetos Culturais</div>
-            </div>`;
-            document.body.appendChild(viewModal);
-            viewModal.addEventListener('click', e => { if (e.target === viewModal) viewModal.remove(); });
+            imprimirProjetoCompleto(project);
         }
         
         function checkLogin() {
-            const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+            const currentUser = auth.getCurrentUser();
             if (!currentUser) { 
-                window.location.href = 'login.html'; 
-                return; 
+                window.location.replace('login.html'); 
+                return false;
             }
             const userNameDisplay = document.getElementById('userNameDisplay');
-            if (userNameDisplay) userNameDisplay.textContent = currentUser.name;
+            if (userNameDisplay) userNameDisplay.textContent = '👤 ' + currentUser.name;
             loadProjectsList();
             renderCalendar();
+            return true;
         }
         
         function doLogout() { 
-            sessionStorage.removeItem('currentUser'); 
-            window.location.href = 'login.html'; 
+            auth.logout();
+            window.location.replace('login.html'); 
         }
         
         function switchTab(tabName) {
@@ -2115,15 +2430,15 @@
             tabs.forEach(tab => tab.classList.remove('active'));
             contents.forEach(content => content.classList.remove('active'));
             
-            const tabIndex = { 'info': 0, 'especificacoes': 1, 'cronograma': 2, 'budget': 3, 'comunicacao': 4 };
+            const tabIndex = { 'info': 0, 'especificacoes': 1, 'cronograma': 2, 'budget': 3, 'comunicacao': 4, 'relatorios': 5 };
             if (tabs[tabIndex[tabName]]) tabs[tabIndex[tabName]].classList.add('active');
             
-            const contentId = { 'info': 'tabInfo', 'especificacoes': 'tabEspecificacoes', 'cronograma': 'tabCronograma', 'budget': 'tabBudget', 'comunicacao': 'tabComunicacao' };
+            const contentId = { 'info': 'tabInfo', 'especificacoes': 'tabEspecificacoes', 'cronograma': 'tabCronograma', 'budget': 'tabBudget', 'comunicacao': 'tabComunicacao', 'relatorios': 'tabRelatorios' };
             const content = document.getElementById(contentId[tabName]);
             if (content) content.classList.add('active');
+            
+            if (tabName === 'especificacoes') updateSpecifications();
         }
-        
-        // ========== FUNÇÕES DE STATUS DAS TAREFAS ==========
         
         function toggleTaskStatusByDay(taskId, projectId, taskNome, currentStatus, dataEspecifica, dataInicio, dataFim) {
             const modal = document.createElement('div');
@@ -2131,10 +2446,9 @@
             modal.innerHTML = `
                 <div class="task-status-content">
                     <h3>📋 ${escapeHtml(taskNome)}</h3>
-                    <p style="font-size: 12px; color: #666;">📅 Data: <strong>${dataEspecifica}</strong></p>
-                    <p style="font-size: 12px; color: #666;">Período da tarefa: ${dataInicio} até ${dataFim}</p>
-                    <p>Status atual nesta data: <strong>${currentStatus === 'completed' ? '✅ Concluída' : '⏳ Pendente'}</strong></p>
-                    <p>Alterar status APENAS para o dia <strong>${dataEspecifica}</strong>?</p>
+                    <p>Data: <strong>${dataEspecifica}</strong></p>
+                    <p>Período: ${dataInicio} até ${dataFim}</p>
+                    <p>Status: <strong>${currentStatus === 'completed' ? '✅ Concluída' : '⏳ Pendente'}</strong></p>
                     <div class="task-status-buttons">
                         ${currentStatus !== 'completed' ? 
                             `<button class="btn-mark-complete" onclick="marcarDiaTarefaConcluido(${projectId}, '${escapeHtml(taskNome)}', '${dataEspecifica}')">✓ Marcar este dia como Concluído</button>` : 
@@ -2145,97 +2459,70 @@
                 </div>
             `;
             document.body.appendChild(modal);
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.remove();
-            });
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         }
         
         function marcarDiaTarefaConcluido(projectId, taskNome, dataEspecifica) {
-            let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            let projects = auth.getUserProjects();
             const projectIndex = projects.findIndex(p => p.id == projectId);
-            
             if (projectIndex !== -1) {
                 const project = projects[projectIndex];
-                let tarefaEncontrada = false;
-                
+                let encontrado = false;
                 if (project.cronograma) {
                     for (let fase in project.cronograma) {
                         const tarefaIndex = project.cronograma[fase].findIndex(t => t.nome === taskNome);
-                        
                         if (tarefaIndex !== -1) {
                             const tarefa = project.cronograma[fase][tarefaIndex];
                             if (!tarefa.statusPorDia) tarefa.statusPorDia = {};
                             tarefa.statusPorDia[dataEspecifica] = 'completed';
-                            tarefaEncontrada = true;
+                            encontrado = true;
                             break;
                         }
                     }
                 }
-                
-                if (tarefaEncontrada) {
+                if (encontrado) {
                     projects[projectIndex] = project;
-                    localStorage.setItem('cultureProjects', JSON.stringify(projects));
-                    
-                    if (currentProjectId == projectId) {
-                        loadCronogramaData(project.cronograma);
-                    }
-                    
-                    alert(`✅ Dia ${dataEspecifica} da tarefa "${taskNome}" marcado como CONCLUÍDO!`);
+                    auth.saveUserProjects(projects);
+                    showNotification(`✅ Dia ${dataEspecifica} da tarefa "${taskNome}" marcado como CONCLUÍDO!`, 'success');
                     renderCalendar();
                     loadProjectsList();
-                    
                     document.querySelectorAll('.task-status-modal').forEach(m => m.remove());
-                } else {
-                    alert('Erro: Tarefa não encontrada!');
                 }
             }
         }
         
         function marcarDiaTarefaPendente(projectId, taskNome, dataEspecifica) {
-            let projects = JSON.parse(localStorage.getItem('cultureProjects') || '[]');
+            let projects = auth.getUserProjects();
             const projectIndex = projects.findIndex(p => p.id == projectId);
-            
             if (projectIndex !== -1) {
                 const project = projects[projectIndex];
-                let tarefaEncontrada = false;
-                
+                let encontrado = false;
                 if (project.cronograma) {
                     for (let fase in project.cronograma) {
                         const tarefaIndex = project.cronograma[fase].findIndex(t => t.nome === taskNome);
-                        
                         if (tarefaIndex !== -1) {
                             const tarefa = project.cronograma[fase][tarefaIndex];
                             if (!tarefa.statusPorDia) tarefa.statusPorDia = {};
                             tarefa.statusPorDia[dataEspecifica] = 'pending';
-                            tarefaEncontrada = true;
+                            encontrado = true;
                             break;
                         }
                     }
                 }
-                
-                if (tarefaEncontrada) {
+                if (encontrado) {
                     projects[projectIndex] = project;
-                    localStorage.setItem('cultureProjects', JSON.stringify(projects));
-                    
-                    if (currentProjectId == projectId) {
-                        loadCronogramaData(project.cronograma);
-                    }
-                    
-                    alert(`⏳ Dia ${dataEspecifica} da tarefa "${taskNome}" marcado como PENDENTE!`);
+                    auth.saveUserProjects(projects);
+                    showNotification(`⏳ Dia ${dataEspecifica} da tarefa "${taskNome}" marcado como PENDENTE!`, 'info');
                     renderCalendar();
                     loadProjectsList();
-                    
                     document.querySelectorAll('.task-status-modal').forEach(m => m.remove());
-                } else {
-                    alert('Erro: Tarefa não encontrada!');
                 }
             }
         }
         
         // ========== INICIALIZAÇÃO ==========
         document.addEventListener('DOMContentLoaded', function() {
-            checkLogin();
+            setTimeout(function() { checkLogin(); }, 100);
             
             const categoriaSelect = document.getElementById('projCategoria');
             if (categoriaSelect) categoriaSelect.addEventListener('change', updateSpecifications);
@@ -2248,6 +2535,13 @@
             
             const categoriaSelectOrc = document.getElementById('categoriaItem');
             if (categoriaSelectOrc) categoriaSelectOrc.addEventListener('change', atualizarNumeroItem);
+            
+            const prestacaoQtd = document.getElementById('prestacaoQuantidade');
+            const prestacaoValor = document.getElementById('prestacaoValorUnit');
+            if (prestacaoQtd && prestacaoValor) {
+                prestacaoQtd.addEventListener('input', calcularTotalPrestacao);
+                prestacaoValor.addEventListener('input', calcularTotalPrestacao);
+            }
             
             window.onclick = function(event) {
                 const modal = document.getElementById('projectModal');
